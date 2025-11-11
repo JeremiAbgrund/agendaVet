@@ -1,0 +1,105 @@
+:host {
+  ion-content {
+    --background: linear-gradient(135deg, var(--ion-color-primary), #3d8bd9);
+    color: #fff;
+  }
+}
+
+.brand-section {
+  text-align: center;
+  margin-top: 2rem;
+  color: #fff;
+}
+
+.brand-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  padding: 0.8rem 1.6rem;
+  backdrop-filter: blur(6px);
+
+  ion-icon {
+    font-size: 2rem;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 600;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+    opacity: 0.9;
+  }
+}
+
+.card-wrapper {
+  width: min(420px, 92vw);
+  margin: 2rem auto 4rem;
+}
+
+ion-card {
+  box-shadow: 0 18px 30px rgba(0, 0, 0, 0.25);
+  border-radius: 24px;
+}
+
+.input-item {
+  border-radius: 16px;
+  margin-bottom: 0.5rem;
+  --background: rgba(0, 0, 0, 0.02);
+
+  &.invalid {
+    --highlight-color-focused: var(--ion-color-danger);
+    border: 1px solid var(--ion-color-danger);
+  }
+}
+
+ion-note {
+  margin-left: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.actions-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 1rem 0;
+}
+
+.terms-item {
+  border-radius: 16px;
+  padding-inline-start: 0;
+
+  ion-label {
+    margin-left: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  &.invalid {
+    ion-label {
+      color: var(--ion-color-danger);
+    }
+  }
+}
+
+.login-btn {
+  margin-top: 1.5rem;
+  height: 48px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+ion-text {
+  display: block;
+  text-align: center;
+  margin-top: 1rem;
+
+  a {
+    color: var(--ion-color-primary);
+    font-weight: 600;
+  }
+}

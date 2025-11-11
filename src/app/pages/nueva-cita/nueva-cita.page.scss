@@ -1,0 +1,36 @@
+:host {
+  ion-header {
+    --background: linear-gradient(135deg, var(--ion-color-primary), #3d8bd9);
+    color: #fff;
+  }
+
+  ion-toolbar {
+    --color: #fff;
+  }
+}
+
+.nueva-cita-content {
+  --background: var(--ion-color-light);
+}
+
+.hero {
+  margin: 1rem 0;
+
+  h1 {
+    margin-bottom: 0.2rem;
+  }
+
+  p {
+    margin: 0;
+    color: var(--ion-color-medium);
+  }
+}
+
+ion-list {
+  background: transparent;
+}
+
+ion-item {
+  --border-radius: 18px;
+  margin-bottom: 0.5rem;
+}

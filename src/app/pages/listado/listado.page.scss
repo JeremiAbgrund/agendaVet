@@ -1,0 +1,60 @@
+:host {
+  ion-header {
+    --background: linear-gradient(135deg, var(--ion-color-primary), #3d8bd9);
+    color: #fff;
+  }
+
+  ion-toolbar {
+    --color: #fff;
+  }
+}
+
+.list-content {
+  --background: var(--ion-color-light);
+}
+
+.filters {
+  ion-searchbar {
+    --background: #fff;
+    border-radius: 16px;
+  }
+
+  ion-segment {
+    margin-top: 0.5rem;
+  }
+}
+
+.appointments-list {
+  padding: 0 1rem;
+}
+
+.appointment-card {
+  margin: 0.6rem 0;
+  border-radius: 20px;
+  --background: #fff;
+  box-shadow: 0 14px 25px rgba(0, 0, 0, 0.08);
+
+  ion-avatar {
+    background: rgba(255, 255, 255, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    ion-icon {
+      font-size: 1.8rem;
+      color: var(--ion-color-primary);
+    }
+  }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 3rem;
+  gap: 0.5rem;
+
+  ion-icon {
+    font-size: 3rem;
+  }
+}

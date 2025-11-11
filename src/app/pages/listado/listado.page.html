@@ -1,0 +1,59 @@
+<ion-header class="list-header" translucent="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Citas agendadas</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="list-content" [fullscreen]="true">
+  <div class="filters ion-padding">
+    <ion-searchbar
+      placeholder="Buscar por mascota o tutor"
+      debounce="300"
+      (ionInput)="onSearchChanged($event)">
+    </ion-searchbar>
+
+    <ion-segment value="todos" (ionChange)="onStatusChanged($event)">
+      <ion-segment-button value="todos">
+        <ion-label>Todos</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="confirmada">
+        <ion-label>Confirmadas</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="pendiente">
+        <ion-label>Pendientes</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </div>
+
+  <ion-list lines="none" class="appointments-list">
+    <ion-item-sliding *ngFor="let appointment of filteredAppointments; trackBy: trackByAppointment">
+      <ion-item #appointmentCard class="appointment-card" (click)="goToDetail()">
+        <ion-avatar slot="start">
+          <ion-icon name="paw-outline"></ion-icon>
+        </ion-avatar>
+        <ion-label>
+          <h2>{{ appointment.petName }} · {{ appointment.type }}</h2>
+          <p>{{ appointment.date }} a las {{ appointment.time }}</p>
+          <ion-note>{{ appointment.vet }}</ion-note>
+        </ion-label>
+        <ion-chip [color]="appointment.status === 'confirmada' ? 'success' : 'warning'">
+          {{ appointment.status }}
+        </ion-chip>
+      </ion-item>
+      <ion-item-options>
+        <ion-item-option color="tertiary" (click)="toggleFavorite(appointment)">
+          <ion-icon [name]="appointment.favorite ? 'heart' : 'heart-outline'" slot="start"></ion-icon>
+          Favorito
+        </ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
+  </ion-list>
+
+  <ion-text color="medium" class="empty-state" *ngIf="!filteredAppointments.length">
+    <ion-icon name="calendar-outline"></ion-icon>
+    <p>No encontramos citas con los filtros aplicados.</p>
+  </ion-text>
+</ion-content>

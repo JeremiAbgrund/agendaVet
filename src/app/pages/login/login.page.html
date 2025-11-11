@@ -1,0 +1,88 @@
+<ion-content class="login-page" [fullscreen]="true">
+  <section class="brand-section">
+    <div class="brand-badge" aria-label="Identidad de AgendaVet">
+      <ion-icon name="paw-outline" aria-hidden="true"></ion-icon>
+      <div>
+        <h1>AgendaVet</h1>
+        <p>Gestiona tus citas veterinarias sin estrés.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card-wrapper">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-subtitle>Bienvenido</ion-card-subtitle>
+        <ion-card-title>Inicia sesión</ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+          <ion-list lines="none">
+            <ion-item class="input-item" [class.invalid]="emailInvalid">
+              <ion-icon slot="start" name="mail-outline" aria-hidden="true"></ion-icon>
+              <ion-input
+                label="Correo electrónico"
+                labelPlacement="floating"
+                placeholder="usuario@agendavet.cl"
+                inputmode="email"
+                formControlName="email"
+                autocomplete="email">
+              </ion-input>
+            </ion-item>
+            <ion-note color="danger" *ngIf="emailInvalid">
+              Ingresa un correo válido (ej: cliente@agendavet.cl).
+            </ion-note>
+
+            <ion-item class="input-item" [class.invalid]="passwordInvalid">
+              <ion-icon slot="start" name="lock-closed-outline" aria-hidden="true"></ion-icon>
+              <ion-input
+                label="Contraseña"
+                labelPlacement="floating"
+                type="password"
+                placeholder="Mínimo 6 caracteres"
+                formControlName="password"
+                autocomplete="current-password">
+              </ion-input>
+            </ion-item>
+            <ion-note color="danger" *ngIf="passwordInvalid">
+              La contraseña debe tener al menos 6 caracteres.
+            </ion-note>
+          </ion-list>
+
+          <div class="actions-row">
+            <ion-toggle formControlName="remember">
+              Recordar mis datos
+            </ion-toggle>
+            <ion-button size="small" fill="clear" type="button" (click)="fillDemoCredentials()">
+              Usar demo
+            </ion-button>
+          </div>
+
+          <ion-item class="terms-item" [class.invalid]="termsInvalid" lines="none">
+            <ion-checkbox formControlName="acceptTerms"></ion-checkbox>
+            <ion-label>
+              Declaro haber leído y aceptado las políticas de tratamiento de datos.
+            </ion-label>
+          </ion-item>
+          <ion-note color="danger" *ngIf="termsInvalid">
+            Debes aceptar las políticas para continuar.
+          </ion-note>
+
+          <ion-button
+            expand="block"
+            type="submit"
+            class="login-btn"
+            [disabled]="loginForm.invalid || isSubmitting">
+            <ion-spinner slot="start" name="crescent" *ngIf="isSubmitting"></ion-spinner>
+            Ingresar
+          </ion-button>
+
+          <ion-text color="medium">
+            ¿No recuerdas tus credenciales? <a routerLink="/contacto">Contáctanos</a>
+          </ion-text>
+        </form>
+      </ion-card-content>
+    </ion-card>
+  </section>
+</ion-content>

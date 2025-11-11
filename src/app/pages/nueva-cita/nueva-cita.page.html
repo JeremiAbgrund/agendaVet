@@ -1,0 +1,62 @@
+<ion-header translucent="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Nueva cita</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="nueva-cita-content ion-padding">
+  <section class="hero">
+    <h1>Registra una cita</h1>
+    <p>Completa los datos de la mascota y asigna un profesional disponible.</p>
+  </section>
+
+  <form [formGroup]="createForm" (ngSubmit)="submit()">
+    <ion-list lines="full">
+        <ion-item>
+          <ion-label position="stacked">Nombre de la mascota</ion-label>
+          <ion-input formControlName="petName" placeholder="Ej: Luna"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Tutor</ion-label>
+          <ion-input formControlName="ownerName" placeholder="Ej: Jeremi Riquelme"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Motivo</ion-label>
+          <ion-input formControlName="type" placeholder="Vacuna anual, control, etc."></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Fecha</ion-label>
+          <ion-input type="date" formControlName="date" [min]="today()"></ion-input>
+        </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Hora</ion-label>
+        <ion-input type="time" formControlName="time"></ion-input>
+      </ion-item>
+
+      <ion-item class="vet-select" lines="none">
+        <ion-label position="stacked">Veterinario</ion-label>
+        <ion-select interface="popover" formControlName="vet">
+          <ion-select-option *ngFor="let vet of vets" [value]="vet.name">
+            {{ vet.name }} · {{ vet.specialty }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Notas</ion-label>
+        <ion-textarea formControlName="notes" placeholder="Indicaciones adicionales"></ion-textarea>
+      </ion-item>
+    </ion-list>
+
+    <ion-button expand="block" type="submit" [disabled]="createForm.invalid">
+      Guardar cita
+    </ion-button>
+  </form>
+</ion-content>

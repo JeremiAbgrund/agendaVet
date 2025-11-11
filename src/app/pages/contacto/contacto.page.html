@@ -1,0 +1,145 @@
+<ion-header class="contact-header" translucent="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Soporte AgendaVet</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="contact-content" [fullscreen]="true">
+  <section class="hero ion-padding-horizontal">
+    <h1>¿Necesitas ayuda?</h1>
+    <p>Respondemos dudas de agenda, facturación y soporte técnico en menos de 24 horas.</p>
+  </section>
+
+  <ion-card class="form-card ion-margin">
+    <ion-card-header>
+      <ion-card-subtitle>Formulario de contacto</ion-card-subtitle>
+      <ion-card-title>Cuéntanos tu caso</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <form [formGroup]="contactForm" (ngSubmit)="submit()" novalidate>
+        <ion-list lines="full">
+          <ion-item>
+            <ion-icon name="person-outline" slot="start"></ion-icon>
+            <ion-input
+              label="Nombre completo"
+              labelPlacement="stacked"
+              placeholder="Ej: Jeremi Riquelme"
+              formControlName="fullName">
+            </ion-input>
+          </ion-item>
+          <ion-note color="danger" *ngIf="contactForm.get('fullName')?.invalid && contactForm.get('fullName')?.touched">
+            Ingresa un nombre válido (mínimo 3 caracteres).
+          </ion-note>
+
+          <ion-item>
+            <ion-icon name="mail-outline" slot="start"></ion-icon>
+            <ion-input
+              type="email"
+              label="Correo electrónico"
+              labelPlacement="stacked"
+              placeholder="tucorreo@agendavet.cl"
+              formControlName="email"
+              autocomplete="email">
+            </ion-input>
+          </ion-item>
+          <ion-note color="danger" *ngIf="contactForm.get('email')?.invalid && contactForm.get('email')?.touched">
+            Revisa el formato del correo.
+          </ion-note>
+
+          <ion-item>
+            <ion-icon name="call-outline" slot="start"></ion-icon>
+            <ion-input
+              type="tel"
+              label="Teléfono (opcional)"
+              labelPlacement="stacked"
+              placeholder="+56 9 1234 5678"
+              formControlName="phone">
+            </ion-input>
+          </ion-item>
+          <ion-note color="danger" *ngIf="contactForm.get('phone')?.invalid && contactForm.get('phone')?.touched">
+            Solo números, espacios, + o - (6 a 15 caracteres).
+          </ion-note>
+
+          <ion-item>
+            <ion-icon name="folder-outline" slot="start"></ion-icon>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Tipo de consulta</mat-label>
+              <mat-select formControlName="topic">
+                <mat-option *ngFor="let topic of topics" [value]="topic.value">
+                  {{ topic.label }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </ion-item>
+
+          <div class="channel-selector">
+            <p>¿Cómo prefieres que te contactemos?</p>
+            <ion-segment formControlName="preferredChannel" mode="md">
+              <ion-segment-button *ngFor="let channel of channels" [value]="channel.value">
+                <ion-label>{{ channel.label }}</ion-label>
+              </ion-segment-button>
+            </ion-segment>
+          </div>
+
+          <mat-form-field appearance="outline" class="message-field">
+            <mat-label>Mensaje</mat-label>
+            <textarea
+              matInput
+              rows="4"
+              maxlength="{{ MAX_MESSAGE_LENGTH }}"
+              placeholder="Describe brevemente lo ocurrido..."
+              formControlName="message"></textarea>
+            <mat-hint align="end">{{ remainingChars }} caracteres disponibles</mat-hint>
+            <mat-error *ngIf="contactForm.get('message')?.invalid && contactForm.get('message')?.touched">
+              Mínimo 15 caracteres y máximo {{ MAX_MESSAGE_LENGTH }}.
+            </mat-error>
+          </mat-form-field>
+
+          <mat-slide-toggle formControlName="ccCopy">
+            Enviarme copia a mi correo
+          </mat-slide-toggle>
+        </ion-list>
+
+        <ion-button expand="block" type="submit" [disabled]="contactForm.invalid || isSubmitting">
+          <ion-spinner slot="start" name="crescent" *ngIf="isSubmitting"></ion-spinner>
+          Enviar solicitud
+        </ion-button>
+      </form>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card class="history-card ion-margin" *ngIf="supportHistory.length">
+    <ion-card-header>
+      <ion-card-subtitle>Últimos envíos</ion-card-subtitle>
+      <ion-card-title>Seguimiento rápido</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list lines="none">
+        <ion-item *ngFor="let request of supportHistory">
+          <ion-icon name="document-text-outline" slot="start"></ion-icon>
+          <ion-label>
+            <h3>{{ request.topic | titlecase }} via {{ request.preferredChannel }}</h3>
+            <p>{{ request.message }}</p>
+            <ion-note color="medium">{{ request.createdAt | date:'short' }}</ion-note>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+
+  <section class="faq-section ion-padding-horizontal">
+    <h2>Preguntas frecuentes</h2>
+    <mat-accordion>
+      <mat-expansion-panel *ngFor="let faq of faqs">
+        <mat-expansion-panel-header>
+          <mat-panel-title>{{ faq.question }}</mat-panel-title>
+        </mat-expansion-panel-header>
+        <p>{{ faq.answer }}</p>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </section>
+</ion-content>

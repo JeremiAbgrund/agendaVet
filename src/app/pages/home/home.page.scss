@@ -1,0 +1,151 @@
+:host {
+  ion-header {
+    --background: linear-gradient(135deg, var(--ion-color-primary), #3d8bd9);
+    color: #fff;
+  }
+
+  ion-toolbar {
+    --color: #fff;
+  }
+}
+
+.home-content {
+  --background: var(--ion-color-light);
+}
+
+.hero-card {
+  margin-top: 1rem;
+  color: #fff;
+
+  .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-size: 0.8rem;
+    opacity: 0.8;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+    margin: 0.3rem 0;
+  }
+
+  .subtitle {
+    margin: 0;
+    opacity: 0.9;
+  }
+}
+
+ion-card.next-appointment {
+  border-radius: 20px;
+  box-shadow: 0 20px 35px rgba(28, 78, 128, 0.15);
+
+  ion-item {
+    --background: transparent;
+    --inner-padding-end: 0;
+    --inner-padding-top: 6px;
+    --inner-padding-bottom: 6px;
+
+    ion-icon {
+      font-size: 1.4rem;
+    }
+  }
+
+  ion-note {
+    display: block;
+    margin-top: 0.5rem;
+  }
+}
+
+.manage-link {
+  margin: 0.5rem 0 1rem;
+
+  ion-button {
+    --border-radius: 14px;
+  }
+}
+
+.stats-grid ion-card {
+  border-radius: 18px;
+  text-align: center;
+  box-shadow: none;
+  background: #fff;
+
+  ion-icon {
+    font-size: 1.6rem;
+    margin-bottom: 0.4rem;
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+
+  p {
+    margin: 0;
+    color: var(--ion-color-medium);
+    font-size: 0.9rem;
+  }
+}
+
+.quick-actions h2,
+.reminders h2,
+.upcoming h2 {
+  margin: 1.2rem 0 0.6rem;
+}
+
+.quick-actions ion-button {
+  --padding-top: 0.6rem;
+  --padding-bottom: 0.6rem;
+  --padding-start: 1rem;
+  --padding-end: 1rem;
+  --border-radius: 14px;
+  font-size: 0.95rem;
+  height: 46px;
+  max-width: 220px;
+  margin: 0 auto;
+  display: block;
+}
+
+.reminders ion-item {
+  --border-radius: 18px;
+  margin-bottom: 0.4rem;
+  align-items: flex-start;
+
+  ion-button {
+    margin-left: 0.5rem;
+  }
+}
+
+.reminders .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .bell-toggle {
+    font-size: 1.4rem;
+    cursor: pointer;
+  }
+
+  .bell-toggle.muted {
+    text-decoration: line-through;
+    opacity: 0.6;
+  }
+}
+
+.upcoming ion-avatar {
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  ion-icon {
+    font-size: 1.3rem;
+    color: var(--ion-color-primary);
+  }
+}

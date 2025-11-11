@@ -1,0 +1,7 @@
+{
+  "name": "agenda-vet",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

@@ -1,0 +1,9 @@
+.manage-content {
+  --background: var(--ion-color-light);
+}
+
+ion-item {
+  align-items: flex-start;
+  --border-radius: 16px;
+  margin: 0.4rem 0;
+}

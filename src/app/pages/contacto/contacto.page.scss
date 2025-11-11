@@ -1,0 +1,99 @@
+:host {
+  ion-header {
+    --background: linear-gradient(135deg, var(--ion-color-primary), #3d8bd9);
+    color: #fff;
+  }
+
+  ion-toolbar {
+    --color: #fff;
+  }
+}
+
+.contact-content {
+  --background: var(--ion-color-light);
+}
+
+.hero {
+  margin-top: 1rem;
+  color: #1d3b63;
+
+  h1 {
+    font-size: 1.6rem;
+    margin-bottom: 0.3rem;
+  }
+
+  p {
+    margin: 0;
+    color: var(--ion-color-medium);
+  }
+}
+
+.form-card,
+.history-card {
+  border-radius: 24px;
+}
+
+ion-list {
+  background: transparent;
+}
+
+ion-item {
+  --border-radius: 18px;
+  margin-bottom: 0.4rem;
+}
+
+.full-width,
+.message-field {
+  width: 100%;
+}
+
+mat-form-field {
+  margin-top: 0.4rem;
+}
+
+.message-field {
+  display: block;
+  margin-top: 1rem;
+}
+
+.mat-mdc-slide-toggle {
+  display: block;
+  margin: 0.5rem 0 1rem;
+}
+
+.channel-selector {
+  margin: 1rem 0;
+
+  p {
+    margin-bottom: 0.4rem;
+    font-weight: 600;
+  }
+}
+
+.message-item {
+  align-items: flex-start;
+
+  ion-textarea {
+    min-height: 120px;
+  }
+}
+
+.message-footer {
+  display: flex;
+  justify-content: space-between;
+  margin: 0.2rem 0 1rem;
+}
+
+.history-card ion-item {
+  --background: rgba(255, 255, 255, 0.6);
+}
+
+.faq-section {
+  h2 {
+    margin-bottom: 0.6rem;
+  }
+
+  mat-accordion {
+    background: transparent;
+  }
+}
