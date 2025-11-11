@@ -1,4 +1,4 @@
-# AgendaVet (Semana 3 – PGY4221)
+# AgendaVet
 
 Aplicación híbrida Ionic + Angular para gestionar citas veterinarias. Este proyecto sigue los requisitos de la actividad con encargo "Creando mi proyecto Gestor de Citas Veterinarias".
 
@@ -19,9 +19,3 @@ ionic serve       # levanta la app en modo desarrollo
 ionic g page ...  # genera nuevas páginas lazy
 ionic build       # genera build de producción
 ```
-
-## Próximos pasos
-1. Implementar UI/validaciones en cada page según la rúbrica.
-2. Añadir servicios/mock data en `shared/services`.
-3. Configurar animaciones con `createAnimation`.
-4. Integrar Angular Material (≥3 componentes) y documentar avances en `agendaVet/REQUISITOS.md`.
