@@ -60,7 +60,8 @@ export class ContactoPage implements OnInit {
     private toastController: ToastController
   ) { }
 
-  ngOnInit() {
+  async ngOnInit() {
+    await this.supportService.ready;
     this.supportHistory = this.supportService.getHistory().slice(0, 3);
   }
 

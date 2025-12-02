@@ -17,7 +17,8 @@ export class HistorialPage implements OnInit {
 
   constructor(private supportService: SupportService) {}
 
-  ngOnInit() {
+  async ngOnInit() {
+    await this.supportService.ready;
     this.loadRequests();
   }
 

@@ -19,7 +19,8 @@ export class GestionarCitasPage implements OnInit {
     private toastController: ToastController
   ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
+    await this.appointmentsService.ready;
     this.loadAppointments();
   }
 

@@ -1,16 +1,16 @@
 :host {
   ion-header {
-    --background: linear-gradient(135deg, var(--ion-color-primary), #3d8bd9);
-    color: #fff;
+    --background: #f5f7fb;
+    color: #1f2933;
   }
 
   ion-toolbar {
-    --color: #fff;
+    --color: #1f2933;
   }
 }
 
 .contact-content {
-  --background: var(--ion-color-light);
+  --background: var(--ion-background-color);
 }
 
 .hero {

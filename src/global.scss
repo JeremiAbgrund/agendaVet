@@ -1,9 +1,5 @@
 
-// Include theming for Angular Material with `mat.theme()`.
-// This Sass mixin will define CSS variables that are used for styling Angular Material
-// components according to the Material 3 design spec.
-// Learn more about theming and how to use it for your application's
-// custom components at https://material.angular.dev/guide/theming
+// Incluir theming de Angular Material con `mat.theme()`
 @use '@angular/material' as mat;
 
 html {
@@ -59,6 +55,7 @@ body {
 @import "@ionic/angular/css/text-alignment.css";
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
+@import "leaflet/dist/leaflet.css";
 
 /**
  * Ionic Dark Mode
@@ -69,7 +66,57 @@ body {
 
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import "@ionic/angular/css/palettes/dark.system.css";
-
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+:root {
+  color-scheme: light;
+  --ion-background-color: #f5f7fb;
+  --ion-text-color: #1f2933;
+  --ion-card-background: #ffffff;
+  --ion-item-background: #ffffff;
+}
+
+/* Colores base explícitos para consistencia entre navegadores */
+ion-content {
+  --background: var(--ion-background-color);
+  color: var(--ion-text-color);
+}
+
+ion-card {
+  --background: var(--ion-card-background);
+  color: var(--ion-text-color);
+}
+
+ion-item {
+  --background: var(--ion-item-background);
+  --color: var(--ion-text-color);
+  color: var(--ion-text-color);
+}
+
+ion-label,
+ion-text,
+ion-input,
+ion-textarea {
+  color: var(--ion-text-color);
+}
+
+ion-note {
+  color: #4b5563;
+}
+
+/* Colores base explícitos para consistencia entre navegadores */
+ion-content {
+  --background: #f7f7f7;
+}
+
+ion-text,
+ion-label,
+ion-item,
+ion-card {
+  color: #333;
+}
+
+ion-card {
+  --background: #ffffff;
+}

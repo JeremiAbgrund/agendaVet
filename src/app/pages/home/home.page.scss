@@ -1,27 +1,36 @@
 :host {
   ion-header {
-    --background: linear-gradient(135deg, var(--ion-color-primary), #3d8bd9);
-    color: #fff;
+    --background: #f5f7fb;
+    color: #1f2933;
   }
 
   ion-toolbar {
-    --color: #fff;
+    --color: #1f2933;
+    --padding-end: 6px;
+  }
+
+  .avatar-btn {
+    padding: 0 2px;
+    min-height: 40px;
+    min-width: 40px;
+    --background: transparent;
   }
 }
 
 .home-content {
-  --background: var(--ion-color-light);
+  --background: var(--ion-background-color);
+  color: var(--ion-text-color);
 }
 
 .hero-card {
   margin-top: 1rem;
-  color: #fff;
+  color: #1f2933;
 
   .eyebrow {
     text-transform: uppercase;
     letter-spacing: 0.2em;
     font-size: 0.8rem;
-    opacity: 0.8;
+    opacity: 0.7;
   }
 
   h1 {
@@ -31,7 +40,7 @@
 
   .subtitle {
     margin: 0;
-    opacity: 0.9;
+    opacity: 0.8;
   }
 }
 

@@ -2,12 +2,11 @@
   <ion-toolbar color="transparent">
     <ion-title>AgendaVet</ion-title>
     <ion-buttons slot="end">
-      <ion-button fill="clear" aria-label="Ver notificaciones">
-        <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
+      <ion-button fill="clear" class="avatar-btn" (click)="goHome()" aria-label="Volver al inicio">
+        <ion-avatar>
+          <img src="assets/img/pet-avatar.svg" alt="Avatar de usuario" />
+        </ion-avatar>
       </ion-button>
-      <ion-avatar slot="end">
-        <img src="assets/img/pet-avatar.svg" alt="Avatar de usuario" />
-      </ion-avatar>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -126,6 +125,24 @@
         <ion-button fill="clear" color="danger" slot="end" (click)="removeReminder(reminder.id)">
           <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
         </ion-button>
+      </ion-item>
+    </ion-list>
+  </section>
+
+  <section class="tips ion-padding-horizontal" *ngIf="remoteTips.length">
+    <div class="section-header">
+      <h2>Tips de cuidado</h2>
+      <ion-badge color="medium" *ngIf="remoteTipsFromCache">Datos locales</ion-badge>
+    </div>
+    <ion-list lines="inset">
+      <ion-item *ngFor="let tip of remoteTips">
+        <ion-icon slot="start" name="bulb-outline" color="primary"></ion-icon>
+        <ion-label>
+          <p>{{ tip.title }}</p>
+        </ion-label>
+        <ion-badge [color]="tip.completed ? 'success' : 'warning'">
+          {{ tip.completed ? 'Hecho' : 'Pendiente' }}
+        </ion-badge>
       </ion-item>
     </ion-list>
   </section>

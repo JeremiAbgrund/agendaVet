@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { PetProfile, UserProfile } from '../models/profile.model';
+import { StorageService } from './storage.service';
 
 const PROFILE_KEY = 'agendavet_profile';
 
@@ -7,7 +8,7 @@ const DEFAULT_PROFILE: UserProfile = {
   ownerName: 'Jeremi Riquelme',
   email: 'jeremi@agendavet.cl',
   phone: '+56 9 1111 2222',
-  clinic: 'Clínica Patitas Felices',
+  clinic: 'Clinica Patitas Felices',
   notifications: {
     email: true,
     sms: false,
@@ -15,30 +16,17 @@ const DEFAULT_PROFILE: UserProfile = {
   },
   vets: [
     { id: 'vet-1', name: 'Dra. Camila Herrera', specialty: 'Medicina general', available: true },
-    { id: 'vet-2', name: 'Dr. Ortega', specialty: 'Odontología', available: true },
-    { id: 'vet-3', name: 'Dra. Rivas', specialty: 'Dermatología', available: false },
-    { id: 'vet-4', name: 'Dr. Márquez', specialty: 'Cirugía', available: true },
-    { id: 'vet-5', name: 'Dra. Romero', specialty: 'Imágenes', available: true },
+    { id: 'vet-2', name: 'Dr. Ortega', specialty: 'Odontologia', available: true },
+    { id: 'vet-3', name: 'Dra. Rivas', specialty: 'Dermatologia', available: false },
+    { id: 'vet-4', name: 'Dr. Marquez', specialty: 'Cirugia', available: true },
+    { id: 'vet-5', name: 'Dra. Romero', specialty: 'Imagenes', available: true },
     { id: 'vet-6', name: 'Dr. Molina', specialty: 'Control general', available: false },
-    { id: 'vet-7', name: 'Dra. Herrera', specialty: 'Rehabilitación', available: true },
+    { id: 'vet-7', name: 'Dra. Herrera', specialty: 'Rehabilitacion', available: true },
     { id: 'vet-8', name: 'Dr. Salinas', specialty: 'Urgencias', available: true }
   ],
   pets: [
-    {
-      id: 'pet-1',
-      name: 'Luna',
-      species: 'gato',
-      breed: 'Siamesa',
-      birthdate: '2021-03-18',
-      favorite: true
-    },
-    {
-      id: 'pet-2',
-      name: 'Milo',
-      species: 'perro',
-      breed: 'Border Collie',
-      birthdate: '2020-09-05'
-    }
+    { id: 'pet-1', name: 'Luna', species: 'gato', breed: 'Siamesa', birthdate: '2021-03-18', favorite: true },
+    { id: 'pet-2', name: 'Milo', species: 'perro', breed: 'Border Collie', birthdate: '2020-09-05' }
   ]
 };
 
@@ -47,6 +35,25 @@ const DEFAULT_PROFILE: UserProfile = {
 })
 export class ProfileService {
 
+  private profile: UserProfile = DEFAULT_PROFILE;
+  readonly ready: Promise<void>;
+
+  constructor(private storageService: StorageService) {
+    this.ready = this.load();
+  }
+
+  private async load(): Promise<void> {
+    try {
+      const stored = await this.storageService.get<UserProfile>(PROFILE_KEY);
+      this.profile = stored ? this.normalize(stored) : DEFAULT_PROFILE;
+      if (!stored) {
+        await this.storageService.set(PROFILE_KEY, this.profile);
+      }
+    } catch {
+      this.profile = DEFAULT_PROFILE;
+    }
+  }
+
   private normalize(profile: UserProfile): UserProfile {
     return {
       ...profile,
@@ -54,33 +61,24 @@ export class ProfileService {
     };
   }
 
-  private readProfile(): UserProfile {
-    try {
-      const stored = localStorage.getItem(PROFILE_KEY);
-      return stored ? this.normalize(JSON.parse(stored)) : DEFAULT_PROFILE;
-    } catch {
-      localStorage.removeItem(PROFILE_KEY);
-      return DEFAULT_PROFILE;
-    }
-  }
-
   getProfile(): UserProfile {
-    return this.readProfile();
+    return this.profile;
   }
 
   updateProfile(profile: UserProfile): void {
-    localStorage.setItem(PROFILE_KEY, JSON.stringify(this.normalize(profile)));
+    this.profile = this.normalize(profile);
+    this.storageService.set(PROFILE_KEY, this.profile);
   }
 
   upsertPet(pet: PetProfile): UserProfile {
-    const profile = this.readProfile();
-    const index = profile.pets.findIndex(p => p.id === pet.id);
+    const current = { ...this.profile, pets: [...this.profile.pets] };
+    const index = current.pets.findIndex(p => p.id === pet.id);
     if (index >= 0) {
-      profile.pets[index] = pet;
+      current.pets[index] = pet;
     } else {
-      profile.pets.push(pet);
+      current.pets.push(pet);
     }
-    this.updateProfile(profile);
-    return profile;
+    this.updateProfile(current);
+    return current;
   }
 }

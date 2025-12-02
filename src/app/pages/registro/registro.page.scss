@@ -1,4 +1,4 @@
-.manage-content {
+.registro-content {
   --background: var(--ion-background-color);
 }
 
@@ -13,8 +13,12 @@
   }
 }
 
-ion-item {
-  align-items: flex-start;
-  --border-radius: 16px;
-  margin: 0.4rem 0;
+.registro-content {
+  ion-card {
+    border-radius: 16px;
+  }
+
+  .hero {
+    margin-bottom: 16px;
+  }
 }

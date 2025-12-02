@@ -25,7 +25,7 @@
   <ion-card class="form-card ion-margin">
     <ion-card-header>
       <ion-card-subtitle>Datos de contacto</ion-card-subtitle>
-      <ion-card-title>Actualiza tu información</ion-card-title>
+      <ion-card-title>Actualiza tu informacion</ion-card-title>
     </ion-card-header>
     <ion-card-content>
       <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" novalidate>
@@ -41,12 +41,12 @@
           </ion-item>
 
           <ion-item>
-            <ion-label position="stacked">Teléfono</ion-label>
+            <ion-label position="stacked">Telefono</ion-label>
             <ion-input type="tel" formControlName="phone"></ion-input>
           </ion-item>
 
           <ion-item>
-            <ion-label position="stacked">Clínica habitual</ion-label>
+            <ion-label position="stacked">Clinica habitual</ion-label>
             <ion-input formControlName="clinic"></ion-input>
           </ion-item>
         </ion-list>
@@ -65,6 +65,13 @@
             <ion-label>Push</ion-label>
             <ion-toggle formControlName="push" color="tertiary"></ion-toggle>
           </ion-item>
+          <ion-item lines="none" button detail="false" (click)="setLocation()">
+            <ion-icon name="locate-outline" slot="start"></ion-icon>
+            <ion-label>Usar mi ubicacion</ion-label>
+          </ion-item>
+          <ion-note color="medium" *ngIf="locationNote">{{ locationNote }}</ion-note>
+          <ion-note color="primary" *ngIf="locationLabel">{{ locationLabel }}</ion-note>
+          <div id="profile-map" class="map-box" *ngIf="locationNote || locationLabel"></div>
         </div>
 
         <section class="pets-section">

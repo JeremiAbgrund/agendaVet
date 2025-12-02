@@ -12,7 +12,9 @@ import { ToastController } from '@ionic/angular';
 export class LoginPage implements OnInit {
 
   readonly SESSION_KEY = 'agendavet_session';
+  readonly USER_KEY = 'agendavet_user';
   isSubmitting = false;
+  registeredUser?: { email: string; password: string; name?: string };
 
   loginForm = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
@@ -37,8 +39,20 @@ export class LoginPage implements OnInit {
           remember: true
         });
       } catch {
-        // si hay basura en el storage, lo ignoramos
+        // Ignorar datos corruptos en storage
         localStorage.removeItem(this.SESSION_KEY);
+      }
+    }
+
+    const storedUser = localStorage.getItem(this.USER_KEY);
+    if (storedUser) {
+      try {
+        this.registeredUser = JSON.parse(storedUser);
+        if (this.registeredUser?.email) {
+          this.loginForm.patchValue({ email: this.registeredUser.email });
+        }
+      } catch {
+        localStorage.removeItem(this.USER_KEY);
       }
     }
   }
@@ -73,9 +87,23 @@ export class LoginPage implements OnInit {
     }
 
     this.isSubmitting = true;
-    const { email, remember } = this.loginForm.getRawValue();
+    const { email, password, remember } = this.loginForm.getRawValue();
 
-    // Simula un request
+    if (this.registeredUser) {
+      if (email !== this.registeredUser.email || password !== this.registeredUser.password) {
+        this.isSubmitting = false;
+        const toast = await this.toastController.create({
+          message: 'Correo o contraseña no coinciden con la cuenta registrada.',
+          duration: 2500,
+          color: 'danger',
+          icon: 'alert-circle-outline'
+        });
+        toast.present();
+        return;
+      }
+    }
+
+    // Simular un request breve
     await new Promise(resolve => setTimeout(resolve, 800));
 
     if (remember) {

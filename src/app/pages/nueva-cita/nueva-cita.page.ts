@@ -4,6 +4,7 @@ import { NavController, ToastController } from '@ionic/angular';
 import { AppointmentsService } from 'src/app/shared/services/appointments.service';
 import { ProfileService } from 'src/app/shared/services/profile.service';
 import { VetProfile } from 'src/app/shared/models/profile.model';
+import { ApiService } from 'src/app/shared/services/api.service';
 
 @Component({
   selector: 'app-nueva-cita',
@@ -29,16 +30,20 @@ export class NuevaCitaPage implements OnInit {
     private appointmentsService: AppointmentsService,
     private profileService: ProfileService,
     private toastController: ToastController,
-    private navController: NavController
+    private navController: NavController,
+    private apiService: ApiService
   ) { }
 
-  ngOnInit() {
+  async ngOnInit() {
+    await this.profileService.ready;
     const profile = this.profileService.getProfile();
     this.vets = profile.vets;
     this.createForm.patchValue({
       ownerName: profile.ownerName,
       vet: profile.vets[0]?.name ?? ''
     });
+
+    this.loadVetsFromApi();
   }
 
   today(): string {
@@ -71,6 +76,17 @@ export class NuevaCitaPage implements OnInit {
     });
     toast.present();
     this.navController.navigateBack('/listado');
+  }
+
+  private loadVetsFromApi(): void {
+    this.apiService.fetchVets().subscribe(vets => {
+      if (vets && vets.length) {
+        this.vets = vets;
+        this.createForm.patchValue({ vet: vets[0].name });
+        const profile = this.profileService.getProfile();
+        this.profileService.updateProfile({ ...profile, vets });
+      }
+    });
   }
 
 }

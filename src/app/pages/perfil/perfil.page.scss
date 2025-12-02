@@ -1,16 +1,16 @@
 :host {
   ion-header {
-    --background: linear-gradient(135deg, var(--ion-color-primary), #3d8bd9);
-    color: #fff;
+    --background: #f5f7fb;
+    color: #1f2933;
   }
 
   ion-toolbar {
-    --color: #fff;
+    --color: #1f2933;
   }
 }
 
 .profile-content {
-  --background: var(--ion-color-light);
+  --background: var(--ion-background-color);
 }
 
 .hero {
@@ -21,14 +21,14 @@
   ion-avatar {
     width: 64px;
     height: 64px;
-    background: rgba(255, 255, 255, 0.3);
+    background: #e8effa;
     display: flex;
     align-items: center;
     justify-content: center;
 
     ion-icon {
       font-size: 3rem;
-      color: #fff;
+      color: var(--ion-color-primary);
     }
   }
 
@@ -38,7 +38,7 @@
 
   p {
     margin: 0;
-    color: rgba(255, 255, 255, 0.8);
+    color: #4b5563;
   }
 }
 
@@ -51,6 +51,13 @@
 
   h2 {
     margin-bottom: 0.4rem;
+  }
+
+  .map-box {
+    height: 220px;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-top: 0.6rem;
   }
 }
 

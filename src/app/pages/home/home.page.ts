@@ -2,6 +2,7 @@ import { Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } fro
 import { AlertController, AnimationController, NavController, ToastController } from '@ionic/angular';
 import { AppointmentsService } from 'src/app/shared/services/appointments.service';
 import { ProfileService } from 'src/app/shared/services/profile.service';
+import { ApiService, TipItem } from 'src/app/shared/services/api.service';
 
 interface QuickAction {
   label: string;
@@ -34,14 +35,14 @@ export class HomePage implements OnInit {
 
   user = {
     name: 'Jeremi',
-    clinic: 'Clínica Patitas Felices',
+    clinic: 'Clinica Patitas Felices',
     pets: 2,
     avatar: 'assets/img/pet-avatar.svg'
   };
 
   stats = [
     { label: 'Citas este mes', value: 0, icon: 'calendar-outline', color: 'tertiary' },
-    { label: 'Vacunas al día', value: 0, icon: 'shield-checkmark-outline', color: 'success' },
+    { label: 'Vacunas al dia', value: 0, icon: 'shield-checkmark-outline', color: 'success' },
     { label: 'Notas pendientes', value: 0, icon: 'alert-circle-outline', color: 'warning' }
   ];
   appointmentsCount = 0;
@@ -53,7 +54,7 @@ export class HomePage implements OnInit {
     date: 'Martes 12 noviembre',
     time: '11:30 hrs',
     vet: 'Dra. Camila Herrera',
-    location: 'Sala 2 · Sucursal Providencia',
+    location: 'Sala 2 - Sucursal Providencia',
     notes: 'Llegar 10 min antes y llevar carnet sanitario.',
     status: 'confirmada'
   };
@@ -66,16 +67,18 @@ export class HomePage implements OnInit {
   ];
 
   reminders = [
-    { id: 'rem-1', pet: 'Milo', task: 'Baño antipulgas', due: 'Hoy 17:00', icon: 'water-outline', done: false },
-    { id: 'rem-2', pet: 'Luna', task: 'Recordar medicamentos', due: 'Mañana 08:00', icon: 'medkit-outline', done: false },
+    { id: 'rem-1', pet: 'Milo', task: 'Bano antipulgas', due: 'Hoy 17:00', icon: 'water-outline', done: false },
+    { id: 'rem-2', pet: 'Luna', task: 'Recordar medicamentos', due: 'Manana 08:00', icon: 'medkit-outline', done: false },
   ];
   remindersMuted = false;
+  remoteTips: TipItem[] = [];
+  remoteTipsFromCache = false;
 
   upcomingAppointments: Appointment[] = [
     {
       petName: 'Milo',
-      type: 'Odontología preventiva',
-      date: 'Jueves 14 · 15:00',
+      type: 'Odontologia preventiva',
+      date: 'Jueves 14 - 15:00',
       time: '15:00',
       vet: 'Dr. Ortega',
       location: 'Sala Dental',
@@ -85,10 +88,10 @@ export class HomePage implements OnInit {
     {
       petName: 'Luna',
       type: 'Control post operatorio',
-      date: 'Viernes 15 · 10:00',
+      date: 'Viernes 15 - 10:00',
       time: '10:00',
       vet: 'Dra. Herrera',
-      location: 'Sala Recuperación',
+      location: 'Sala Recuperacion',
       notes: 'Revisar suturas',
       status: 'confirmada'
     }
@@ -100,11 +103,14 @@ export class HomePage implements OnInit {
     private toastController: ToastController,
     private navController: NavController,
     private profileService: ProfileService,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private apiService: ApiService
   ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
+    await Promise.all([this.appointmentsService.ready, this.profileService.ready]);
     this.loadStats();
+    this.loadRemoteTips();
   }
 
   handleRefresh(event: CustomEvent): void {
@@ -150,6 +156,10 @@ export class HomePage implements OnInit {
     this.navController.navigateForward(action.route);
   }
 
+  goHome(): void {
+    this.navController.navigateRoot('/home');
+  }
+
   toggleReminder(reminder: { done: boolean }, event: CustomEvent): void {
     reminder.done = event.detail.checked;
     this.updatePendingNotes();
@@ -180,7 +190,7 @@ export class HomePage implements OnInit {
               id: `rem-${Date.now()}`,
               pet: data.pet,
               task: data.task,
-              due: `${new Date(data.date).toLocaleDateString('es-CL')} · ${data.time}`,
+              due: `${new Date(data.date).toLocaleDateString('es-CL')} - ${data.time}`,
               icon: 'notifications-outline',
               done: false
             });
@@ -195,8 +205,8 @@ export class HomePage implements OnInit {
 
   async removeReminder(reminderId: string): Promise<void> {
     const alert = await this.alertController.create({
-      header: '¿Eliminar recordatorio?',
-      message: 'Esta acción no se puede deshacer.',
+      header: 'Eliminar recordatorio?',
+      message: 'Esta accion no se puede deshacer.',
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {
@@ -235,4 +245,28 @@ export class HomePage implements OnInit {
     this.stats[2].value = this.pendingNotesCount;
   }
 
+  private loadRemoteTips(): void {
+    this.apiService.fetchTips().subscribe(tips => {
+      this.remoteTips = tips;
+      this.remoteTipsFromCache = !navigator.onLine || !tips?.length;
+    });
+  }
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

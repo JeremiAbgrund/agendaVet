@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { SupportRequest } from '../models/support-request.model';
+import { StorageService } from './storage.service';
 
 const STORAGE_KEY = 'agendavet_support_requests';
 
@@ -8,17 +9,24 @@ const STORAGE_KEY = 'agendavet_support_requests';
 })
 export class SupportService {
 
-  private readStore(): SupportRequest[] {
+  private cache: SupportRequest[] = [];
+  readonly ready: Promise<void>;
+
+  constructor(private storageService: StorageService) {
+    this.ready = this.load();
+  }
+
+  private async load(): Promise<void> {
     try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]');
+      const stored = await this.storageService.get<SupportRequest[]>(STORAGE_KEY);
+      this.cache = stored ?? [];
     } catch {
-      localStorage.removeItem(STORAGE_KEY);
-      return [];
+      this.cache = [];
     }
   }
 
-  private writeStore(data: SupportRequest[]): void {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  private async persist(): Promise<void> {
+    await this.storageService.set(STORAGE_KEY, this.cache);
   }
 
   async submitRequest(payload: Omit<SupportRequest, 'id' | 'createdAt'>): Promise<SupportRequest> {
@@ -30,16 +38,15 @@ export class SupportService {
       createdAt: new Date().toISOString()
     };
 
-    const current = this.readStore();
-    current.unshift(request);
-    this.writeStore(current);
+    this.cache = [request, ...this.cache];
+    await this.persist();
 
-    // Simular latencia
+    // Simular latencia breve para UX
     await new Promise(resolve => setTimeout(resolve, 900));
     return request;
   }
 
   getHistory(): SupportRequest[] {
-    return this.readStore();
+    return this.cache;
   }
 }
