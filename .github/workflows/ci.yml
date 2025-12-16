@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  unit-tests:
+    name: Run unit tests (Karma)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install required system packages
+        run: sudo apt-get update && sudo apt-get install -y libnss3
+
+      - name: Run unit tests
+        run: npm run test:ci --silent
+        env:
+          CI: true
