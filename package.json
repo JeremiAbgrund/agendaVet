@@ -10,6 +10,8 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:ci": "ng test --watch=false --browsers=ChromeHeadlessCI",
+    "e2e": "cypress open",
+    "e2e:ci": "npx http-server ./www -p 8080 & npx cypress run --config baseUrl=http://localhost:8080",
     "lint": "ng lint",
     "validate:metadata": "node ./scripts/validate-playstore.js playstore-metadata.json",
     "validate:config": "node ./scripts/validate-config.js",
@@ -71,7 +73,9 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.8.0"
+    "typescript": "~5.8.0",
+    "cypress": "^12.8.0",
+    "http-server": "^14.1.1"
   },
   "description": "An Ionic project"
 }
