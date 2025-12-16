@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
+import { filter, firstValueFrom } from 'rxjs';
+import { DatabaseService } from 'src/app/shared/services/database.service';
 
 @Component({
   selector: 'app-login',
@@ -12,9 +14,7 @@ import { ToastController } from '@ionic/angular';
 export class LoginPage implements OnInit {
 
   readonly SESSION_KEY = 'agendavet_session';
-  readonly USER_KEY = 'agendavet_user';
   isSubmitting = false;
-  registeredUser?: { email: string; password: string; name?: string };
 
   loginForm = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
@@ -26,7 +26,8 @@ export class LoginPage implements OnInit {
   constructor(
     private fb: FormBuilder,
     private toastController: ToastController,
-    private router: Router
+    private router: Router,
+    private databaseService: DatabaseService
   ) {}
 
   ngOnInit() {
@@ -35,24 +36,12 @@ export class LoginPage implements OnInit {
       try {
         const session = JSON.parse(cached);
         this.loginForm.patchValue({
-          email: session.email ?? '',
+          email: (session.email ?? '').toString().trim().toLowerCase(),
           remember: true
         });
       } catch {
-        // Ignorar datos corruptos en storage
+        // Eliminar datos corruptos en storage
         localStorage.removeItem(this.SESSION_KEY);
-      }
-    }
-
-    const storedUser = localStorage.getItem(this.USER_KEY);
-    if (storedUser) {
-      try {
-        this.registeredUser = JSON.parse(storedUser);
-        if (this.registeredUser?.email) {
-          this.loginForm.patchValue({ email: this.registeredUser.email });
-        }
-      } catch {
-        localStorage.removeItem(this.USER_KEY);
       }
     }
   }
@@ -73,38 +62,71 @@ export class LoginPage implements OnInit {
   }
 
   fillDemoCredentials(): void {
+    // Rellenar credenciales demo (normalizar correo)
     this.loginForm.patchValue({
       email: 'demo@agendavet.cl',
       password: 'ClaveDemo1',
       acceptTerms: true
     });
+    const emailCtrl = this.loginForm.get('email');
+    if (emailCtrl) {
+      emailCtrl.setValue((emailCtrl.value ?? '').toString().trim().toLowerCase());
+    }
   }
 
   async onSubmit(): Promise<void> {
+    // Validar formulario y mostrar mensajes específicos en caso de campos inválidos
     if (this.loginForm.invalid) {
+      if (this.loginForm.get('acceptTerms')?.invalid) {
+        const toast = await this.toastController.create({
+          message: 'Debes aceptar los términos y condiciones para continuar.',
+          duration: 2500,
+          color: 'warning',
+          icon: 'warning-outline'
+        });
+        toast.present();
+      } else if (this.loginForm.get('email')?.invalid) {
+        const toast = await this.toastController.create({
+          message: 'Introduce un correo electrónico válido.',
+          duration: 2500,
+          color: 'warning',
+          icon: 'mail-unread-outline'
+        });
+        toast.present();
+      } else if (this.loginForm.get('password')?.invalid) {
+        const toast = await this.toastController.create({
+          message: 'La contraseña debe tener al menos 6 caracteres.',
+          duration: 2500,
+          color: 'warning',
+          icon: 'lock-closed-outline'
+        });
+        toast.present();
+      }
       this.loginForm.markAllAsTouched();
       return;
     }
 
     this.isSubmitting = true;
-    const { email, password, remember } = this.loginForm.getRawValue();
 
-    if (this.registeredUser) {
-      if (email !== this.registeredUser.email || password !== this.registeredUser.password) {
-        this.isSubmitting = false;
-        const toast = await this.toastController.create({
-          message: 'Correo o contraseña no coinciden con la cuenta registrada.',
-          duration: 2500,
-          color: 'danger',
-          icon: 'alert-circle-outline'
-        });
-        toast.present();
-        return;
-      }
+    // Esperar a que la base de datos esté lista
+    await firstValueFrom(this.databaseService.getDatabaseState().pipe(filter(isReady => isReady)));
+
+    const { password, remember } = this.loginForm.getRawValue();
+    const email = (this.loginForm.get('email')?.value ?? '').toString().trim().toLowerCase();
+
+    const user = await this.databaseService.getUserByEmail(email);
+
+    if (!user || user.password_hash !== password) {
+      this.isSubmitting = false;
+      const toast = await this.toastController.create({
+        message: 'Correo o contraseña incorrectos.',
+        duration: 2500,
+        color: 'danger',
+        icon: 'alert-circle-outline'
+      });
+      toast.present();
+      return;
     }
-
-    // Simular un request breve
-    await new Promise(resolve => setTimeout(resolve, 800));
 
     if (remember) {
       localStorage.setItem(

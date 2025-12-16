@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, catchError, from, map, tap } from 'rxjs';
+import { Observable, catchError, map, of, tap } from 'rxjs';
 import { VetProfile } from '../models/profile.model';
-import { StorageService } from './storage.service';
 
 export interface TipItem {
   id: number;
@@ -25,7 +24,7 @@ const CURATED_TIPS: TipItem[] = [
 })
 export class ApiService {
 
-  constructor(private http: HttpClient, private storageService: StorageService) {}
+  constructor(private http: HttpClient) {}
 
   fetchVets(): Observable<VetProfile[]> {
     const url = 'https://jsonplaceholder.typicode.com/users';
@@ -37,7 +36,7 @@ export class ApiService {
         available: Boolean(user.id % 2 === 0)
       }) as VetProfile)),
       tap(list => this.cache(VETS_KEY, list)),
-      catchError(() => from(this.readCache<VetProfile[]>(VETS_KEY)))
+      catchError(() => of(this.readCache<VetProfile[]>(VETS_KEY)))
     );
   }
 
@@ -53,24 +52,25 @@ export class ApiService {
         }) as TipItem);
       }),
       tap(list => this.cache(TIPS_KEY, list)),
-      catchError(() => from(this.readCache<TipItem[]>(TIPS_KEY)).pipe(
-        map(cached => cached.length ? cached : CURATED_TIPS)
-      ))
+      catchError(() => {
+        const cached = this.readCache<TipItem[]>(TIPS_KEY);
+        return cached.length ? of(cached) : of(CURATED_TIPS);
+      })
     );
   }
 
-  private async cache(key: string, data: unknown): Promise<void> {
+  private cache(key: string, data: unknown): void {
     try {
-      await this.storageService.set(key, data);
+      localStorage.setItem(key, JSON.stringify(data));
     } catch {
-      // Evitar romper flujo si falla storage
+      // sin acción, solo se evita romper el flujo
     }
   }
 
-  private async readCache<T>(key: string): Promise<T> {
+  private readCache<T>(key: string): T {
     try {
-      const stored = await this.storageService.get<T>(key);
-      return stored ?? ([] as unknown as T);
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) as T : ([] as unknown as T);
     } catch {
       return [] as unknown as T;
     }

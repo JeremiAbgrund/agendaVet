@@ -25,12 +25,12 @@ export class ListadoPage implements OnInit {
     private animationCtrl: AnimationController
   ) {}
 
-  ngOnInit() {
-    this.loadAppointments();
+  async ngOnInit() {
+    await this.loadAppointments();
   }
 
-  loadAppointments(): void {
-    this.appointments = this.appointmentsService.list();
+  async loadAppointments(): Promise<void> {
+    this.appointments = await this.appointmentsService.list();
     this.applyFilters();
   }
 
@@ -69,9 +69,15 @@ export class ListadoPage implements OnInit {
   }
 
   async toggleFavorite(appointment: AppointmentItem): Promise<void> {
-    const updated = this.appointmentsService.toggleFavorite(appointment.id);
+    const updated = await this.appointmentsService.toggleFavorite(appointment.id);
     if (updated) {
-      this.loadAppointments();
+      // Actualizamos el appointment en la lista local para no recargar todo
+      const index = this.appointments.findIndex(a => a.id === updated.id);
+      if (index > -1) {
+        this.appointments[index] = updated;
+        this.applyFilters(); // Re-aplicar filtros para actualizar la vista
+      }
+
       const toast = await this.toastController.create({
         message: updated.favorite
           ? `${updated.petName} marcada como favorita.`

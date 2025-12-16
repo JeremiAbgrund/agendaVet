@@ -1,32 +1,22 @@
 import { Injectable } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { SupportRequest } from '../models/support-request.model';
-import { StorageService } from './storage.service';
-
-const STORAGE_KEY = 'agendavet_support_requests';
+import { DatabaseService } from './database.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SupportService {
 
-  private cache: SupportRequest[] = [];
   readonly ready: Promise<void>;
 
-  constructor(private storageService: StorageService) {
-    this.ready = this.load();
+  constructor(private databaseService: DatabaseService) {
+    this.ready = this.init();
   }
 
-  private async load(): Promise<void> {
-    try {
-      const stored = await this.storageService.get<SupportRequest[]>(STORAGE_KEY);
-      this.cache = stored ?? [];
-    } catch {
-      this.cache = [];
-    }
-  }
-
-  private async persist(): Promise<void> {
-    await this.storageService.set(STORAGE_KEY, this.cache);
+  private async init(): Promise<void> {
+    await firstValueFrom(this.databaseService.getDatabaseState());
+    console.log('SupportService is ready');
   }
 
   async submitRequest(payload: Omit<SupportRequest, 'id' | 'createdAt'>): Promise<SupportRequest> {
@@ -38,15 +28,14 @@ export class SupportService {
       createdAt: new Date().toISOString()
     };
 
-    this.cache = [request, ...this.cache];
-    await this.persist();
+    await this.databaseService.addSupportRequest(request);
 
     // Simular latencia breve para UX
     await new Promise(resolve => setTimeout(resolve, 900));
     return request;
   }
 
-  getHistory(): SupportRequest[] {
-    return this.cache;
+  async getHistory(): Promise<SupportRequest[]> {
+    return this.databaseService.getSupportRequests();
   }
 }

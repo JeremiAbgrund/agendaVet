@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
+import { DatabaseService } from 'src/app/shared/services/database.service';
 import { ProfileService } from 'src/app/shared/services/profile.service';
 
 @Component({
@@ -12,7 +13,6 @@ import { ProfileService } from 'src/app/shared/services/profile.service';
 })
 export class RegistroPage {
 
-  readonly USER_KEY = 'agendavet_user';
   readonly SESSION_KEY = 'agendavet_session';
   isSubmitting = false;
 
@@ -29,7 +29,8 @@ export class RegistroPage {
     private fb: FormBuilder,
     private router: Router,
     private toastController: ToastController,
-    private profileService: ProfileService
+    private profileService: ProfileService,
+    private databaseService: DatabaseService
   ) {}
 
   async registrar(): Promise<void> {
@@ -41,26 +42,33 @@ export class RegistroPage {
     this.isSubmitting = true;
     const { ownerName, email, password, clinic, phone } = this.registerForm.getRawValue();
 
-    const newUser = {
-      name: ownerName,
-      email,
-      password,
-      clinic: clinic?.trim() || undefined,
-      phone: phone?.trim() || undefined,
-      createdAt: new Date().toISOString()
-    };
+    try {
+      // Guardar credenciales en la BD. Usar un hash en un proyecto real.
+      await this.databaseService.addUser({ email, password_hash: password });
+    } catch (e) {
+      this.isSubmitting = false;
+      const toast = await this.toastController.create({
+        message: 'El correo electrónico ya está en uso.',
+        duration: 3000,
+        color: 'danger',
+      });
+      toast.present();
+      return;
+    }
 
-    localStorage.setItem(this.USER_KEY, JSON.stringify(newUser));
+    // Aún se usa para pre-rellenar el email en el login
     localStorage.setItem(this.SESSION_KEY, JSON.stringify({ email, timestamp: new Date().toISOString() }));
 
     const currentProfile = this.profileService.getProfile();
-    this.profileService.updateProfile({
-      ...currentProfile,
-      ownerName,
-      email,
-      clinic: clinic?.trim() || currentProfile.clinic,
-      phone: phone?.trim() || currentProfile.phone
-    });
+    if (currentProfile) {
+      await this.profileService.updateProfile({
+        ...currentProfile,
+        ownerName,
+        email,
+        clinic: clinic?.trim() || currentProfile.clinic,
+        phone: phone?.trim() || currentProfile.phone
+      });
+    }
 
     const toast = await this.toastController.create({
       message: 'Cuenta creada. Puedes iniciar sesión con tus datos.',

@@ -19,13 +19,13 @@
   </ion-refresher>
 
   <section class="hero-card ion-padding-horizontal" #heroBlock>
-    <div>
-      <p class="eyebrow">Hola, {{ user.name }}</p>
+    <div *ngIf="userProfile">
+      <p class="eyebrow">Hola, {{ userProfile.ownerName }}</p>
       <h1>Hoy tienes {{ stats[0].value }} citas activas</h1>
       <p class="subtitle">Gestiona tus mascotas desde un solo lugar.</p>
       <ion-chip color="light" outline="true">
         <ion-icon name="home-outline" aria-hidden="true"></ion-icon>
-        <ion-label>{{ user.clinic }}</ion-label>
+        <ion-label>{{ userProfile.clinic }}</ion-label>
       </ion-chip>
     </div>
   </section>

@@ -19,17 +19,17 @@ export class HistorialPage implements OnInit {
 
   async ngOnInit() {
     await this.supportService.ready;
-    this.loadRequests();
+    await this.loadRequests();
   }
 
-  loadRequests(): void {
-    this.requests = this.supportService.getHistory();
+  async loadRequests(): Promise<void> {
+    this.requests = await this.supportService.getHistory();
     this.applyFilter();
   }
 
-  doRefresh(event: CustomEvent): void {
+  async doRefresh(event: CustomEvent): Promise<void> {
+    await this.loadRequests();
     setTimeout(() => {
-      this.loadRequests();
       event.detail.complete();
     }, 600);
   }

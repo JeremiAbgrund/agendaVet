@@ -3,6 +3,7 @@ import { AlertController, AnimationController, NavController, ToastController } 
 import { AppointmentsService } from 'src/app/shared/services/appointments.service';
 import { ProfileService } from 'src/app/shared/services/profile.service';
 import { ApiService, TipItem } from 'src/app/shared/services/api.service';
+import { UserProfile } from 'src/app/shared/models/profile.model';
 
 interface QuickAction {
   label: string;
@@ -11,6 +12,7 @@ interface QuickAction {
   route: string;
 }
 
+// Se mantiene para la data hardcodeada de la UI
 interface Appointment {
   petName: string;
   type: string;
@@ -33,21 +35,15 @@ export class HomePage implements OnInit {
   @ViewChild('heroBlock', { read: ElementRef }) heroBlock?: ElementRef<HTMLElement>;
   @ViewChildren('statCard', { read: ElementRef }) statCards?: QueryList<ElementRef<HTMLElement>>;
 
-  user = {
-    name: 'Jeremi',
-    clinic: 'Clinica Patitas Felices',
-    pets: 2,
-    avatar: 'assets/img/pet-avatar.svg'
-  };
+  userProfile?: UserProfile;
 
   stats = [
     { label: 'Citas este mes', value: 0, icon: 'calendar-outline', color: 'tertiary' },
-    { label: 'Vacunas al dia', value: 0, icon: 'shield-checkmark-outline', color: 'success' },
+    { label: 'Mascotas', value: 0, icon: 'paw-outline', color: 'success' },
     { label: 'Notas pendientes', value: 0, icon: 'alert-circle-outline', color: 'warning' }
   ];
-  appointmentsCount = 0;
-  vaccinesCount = 0;
-  pendingNotesCount = 0;
+
+  // Datos que aun son mocked en esta pagina
   nextAppointment: Appointment = {
     petName: 'Luna',
     type: 'Control general + Vacuna',
@@ -58,14 +54,6 @@ export class HomePage implements OnInit {
     notes: 'Llegar 10 min antes y llevar carnet sanitario.',
     status: 'confirmada'
   };
-
-  quickActions: QuickAction[] = [
-    { label: 'Nueva cita', icon: 'add-circle-outline', color: 'primary', route: '/nueva-cita' },
-    { label: 'Contactar vet', icon: 'chatbubbles-outline', color: 'secondary', route: '/contacto' },
-    { label: 'Historial', icon: 'time-outline', color: 'tertiary', route: '/historial' },
-    { label: 'Mi perfil', icon: 'person-circle-outline', color: 'warning', route: '/perfil' }
-  ];
-
   reminders = [
     { id: 'rem-1', pet: 'Milo', task: 'Bano antipulgas', due: 'Hoy 17:00', icon: 'water-outline', done: false },
     { id: 'rem-2', pet: 'Luna', task: 'Recordar medicamentos', due: 'Manana 08:00', icon: 'medkit-outline', done: false },
@@ -73,34 +61,21 @@ export class HomePage implements OnInit {
   remindersMuted = false;
   remoteTips: TipItem[] = [];
   remoteTipsFromCache = false;
-
   upcomingAppointments: Appointment[] = [
-    {
-      petName: 'Milo',
-      type: 'Odontologia preventiva',
-      date: 'Jueves 14 - 15:00',
-      time: '15:00',
-      vet: 'Dr. Ortega',
-      location: 'Sala Dental',
-      notes: 'Ayuno de 6 horas',
-      status: 'pendiente'
-    },
-    {
-      petName: 'Luna',
-      type: 'Control post operatorio',
-      date: 'Viernes 15 - 10:00',
-      time: '10:00',
-      vet: 'Dra. Herrera',
-      location: 'Sala Recuperacion',
-      notes: 'Revisar suturas',
-      status: 'confirmada'
-    }
+    { petName: 'Milo', type: 'Odontologia preventiva', date: 'Jueves 14 - 15:00', time: '15:00', vet: 'Dr. Ortega', location: 'Sala Dental', notes: 'Ayuno de 6 horas', status: 'pendiente' },
+    { petName: 'Luna', type: 'Control post operatorio', date: 'Viernes 15 - 10:00', time: '10:00', vet: 'Dra. Herrera', location: 'Sala Recuperacion', notes: 'Revisar suturas', status: 'confirmada' }
   ];
+  quickActions: QuickAction[] = [
+    { label: 'Nueva cita', icon: 'add-circle-outline', color: 'primary', route: '/nueva-cita' },
+    { label: 'Contactar vet', icon: 'chatbubbles-outline', color: 'secondary', route: '/contacto' },
+    { label: 'Historial', icon: 'time-outline', color: 'tertiary', route: '/historial' },
+    { label: 'Mi perfil', icon: 'person-circle-outline', color: 'warning', route: '/perfil' }
+  ];
+
 
   constructor(
     private animationCtrl: AnimationController,
     private appointmentsService: AppointmentsService,
-    private toastController: ToastController,
     private navController: NavController,
     private profileService: ProfileService,
     private alertController: AlertController,
@@ -109,12 +84,15 @@ export class HomePage implements OnInit {
 
   async ngOnInit() {
     await Promise.all([this.appointmentsService.ready, this.profileService.ready]);
-    this.loadStats();
+    this.userProfile = this.profileService.getProfile();
+    await this.loadStats();
     this.loadRemoteTips();
   }
 
   handleRefresh(event: CustomEvent): void {
-    setTimeout(() => {
+    setTimeout(async () => {
+      await this.loadStats(true);
+      this.loadRemoteTips();
       event.detail.complete();
     }, 800);
   }
@@ -122,33 +100,22 @@ export class HomePage implements OnInit {
   ionViewDidEnter(): void {
     this.animateHero();
     this.animateStats();
+    this.loadStats(true);
   }
 
   private animateHero(): void {
-    if (!this.heroBlock) {
-      return;
-    }
+    if (!this.heroBlock) return;
     this.animationCtrl.create()
       .addElement(this.heroBlock.nativeElement)
-      .duration(500)
-      .easing('ease-out')
-      .fromTo('transform', 'translateY(20px)', 'translateY(0)')
-      .fromTo('opacity', '0', '1')
-      .play();
+      .duration(500).easing('ease-out').fromTo('transform', 'translateY(20px)', 'translateY(0)').fromTo('opacity', '0', '1').play();
   }
 
   private animateStats(): void {
-    if (!this.statCards) {
-      return;
-    }
+    if (!this.statCards) return;
     this.statCards.forEach((card, index) => {
       this.animationCtrl.create()
         .addElement(card.nativeElement)
-        .delay(index * 80)
-        .duration(400)
-        .fromTo('transform', 'scale(0.9)', 'scale(1)')
-        .fromTo('opacity', '0', '1')
-        .play();
+        .delay(index * 80).duration(400).fromTo('transform', 'scale(0.9)', 'scale(1)').fromTo('opacity', '0', '1').play();
     });
   }
 
@@ -183,17 +150,8 @@ export class HomePage implements OnInit {
         {
           text: 'Agregar',
           handler: data => {
-            if (!data.pet || !data.task || !data.date || !data.time) {
-              return false;
-            }
-            this.reminders.push({
-              id: `rem-${Date.now()}`,
-              pet: data.pet,
-              task: data.task,
-              due: `${new Date(data.date).toLocaleDateString('es-CL')} - ${data.time}`,
-              icon: 'notifications-outline',
-              done: false
-            });
+            if (!data.pet || !data.task || !data.date || !data.time) return false;
+            this.reminders.push({ id: `rem-${Date.now()}`, pet: data.pet, task: data.task, due: `${new Date(data.date).toLocaleDateString('es-CL')} - ${data.time}`, icon: 'notifications-outline', done: false });
             this.updatePendingNotes();
             return true;
           }
@@ -209,40 +167,29 @@ export class HomePage implements OnInit {
       message: 'Esta accion no se puede deshacer.',
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
-        {
-          text: 'Eliminar',
-          role: 'destructive',
-          handler: () => {
+        { text: 'Eliminar', role: 'destructive', handler: () => {
             this.reminders = this.reminders.filter(r => r.id !== reminderId);
             this.updatePendingNotes();
-          }
-        }
+        }}
       ]
     });
     alert.present();
   }
 
-  private loadStats(refreshAppointments = false): void {
+  private async loadStats(refreshAppointments = false): Promise<void> {
     if (refreshAppointments) {
-      this.appointmentsCount = this.appointmentsService.list().length;
-    } else if (!this.appointmentsCount) {
-      this.appointmentsCount = this.appointmentsService.list().length;
+      this.stats[0].value = (await this.appointmentsService.list()).length;
     }
-    if (!this.vaccinesCount) {
-      this.vaccinesCount = this.profileService.getProfile().pets.length;
+    const profile = this.profileService.getProfile();
+    if (profile) {
+      this.userProfile = profile;
+      this.stats[1].value = profile.pets.length;
     }
     this.updatePendingNotes();
   }
 
   private updatePendingNotes(): void {
-    this.pendingNotesCount = this.reminders.filter(r => !r.done).length;
-    this.updateStatsArray();
-  }
-
-  private updateStatsArray(): void {
-    this.stats[0].value = this.appointmentsCount;
-    this.stats[1].value = this.vaccinesCount;
-    this.stats[2].value = this.pendingNotesCount;
+    this.stats[2].value = this.reminders.filter(r => !r.done).length;
   }
 
   private loadRemoteTips(): void {
@@ -251,7 +198,6 @@ export class HomePage implements OnInit {
       this.remoteTipsFromCache = !navigator.onLine || !tips?.length;
     });
   }
-
 }
 
 

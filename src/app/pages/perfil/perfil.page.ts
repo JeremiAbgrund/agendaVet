@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AlertController, ToastController } from '@ionic/angular';
 import { PetProfile, UserProfile } from 'src/app/shared/models/profile.model';
 import { ProfileService } from 'src/app/shared/services/profile.service';
@@ -49,14 +49,18 @@ export class PerfilPage implements OnInit {
   async ngOnInit() {
     await this.profileService.ready;
     this.profile = this.profileService.getProfile();
-    this.profileForm.patchValue({
-      ownerName: this.profile.ownerName,
-      email: this.profile.email,
-      phone: this.profile.phone,
-      clinic: this.profile.clinic,
-      notifications: this.profile.notifications
-    });
-    this.profile.pets.forEach(pet => this.addPetForm(pet));
+    if (this.profile) {
+      this.profileForm.patchValue({
+        ownerName: this.profile.ownerName,
+        email: this.profile.email,
+        phone: this.profile.phone,
+        clinic: this.profile.clinic,
+        notifications: this.profile.notifications
+      });
+      // Limpiar el form array antes de llenarlo
+      this.petsFormArray.clear();
+      this.profile.pets.forEach(pet => this.addPetForm(pet));
+    }
   }
 
   async setLocation(): Promise<void> {
@@ -73,7 +77,6 @@ export class PerfilPage implements OnInit {
       this.renderMap(lat, lng);
     };
 
-    // En dispositivo usar plugin; en web usar geolocalizador del navegador.
     if (Capacitor.isNativePlatform()) {
       try {
         const perm = await Geolocation.requestPermissions();
@@ -127,8 +130,8 @@ export class PerfilPage implements OnInit {
     }, 100);
   }
 
-  private createPetForm(pet?: PetProfile) {
-    return this.fb.nonNullable.group({
+  private createPetForm(pet?: PetProfile): FormGroup {
+    return this.fb.group({
       id: [pet?.id ?? `pet-${Date.now()}`],
       name: [pet?.name ?? '', Validators.required],
       species: [pet?.species ?? 'perro', Validators.required],
@@ -143,15 +146,31 @@ export class PerfilPage implements OnInit {
   }
 
   async removePet(index: number): Promise<void> {
+    const petId = this.petsFormArray.at(index).value.id;
+    if (!petId || !petId.startsWith('pet-')) {
+      // Si no tiene ID de la BD, solo lo quita del formulario
+      this.petsFormArray.removeAt(index);
+      return;
+    }
+
     const alert = await this.alertController.create({
       header: 'Eliminar mascota',
-      message: '¿Seguro que deseas remover esta mascota del perfil?',
+      message: '¿Seguro que deseas remover esta mascota del perfil? La acción es permanente.',
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {
           text: 'Eliminar',
           role: 'destructive',
-          handler: () => this.petsFormArray.removeAt(index)
+          handler: async () => {
+            await this.profileService.removePet(petId);
+            this.petsFormArray.removeAt(index);
+            const toast = await this.toastController.create({
+              message: 'Mascota eliminada.',
+              duration: 2000,
+              color: 'success'
+            });
+            toast.present();
+          }
         }
       ]
     });
@@ -163,21 +182,24 @@ export class PerfilPage implements OnInit {
       this.profileForm.markAllAsTouched();
       return;
     }
+    if (!this.profile) return; // safety check
 
     this.isSaving = true;
     const formValue = this.profileForm.getRawValue();
-    const pets = this.petsFormArray.controls.map(ctrl => ctrl.value as PetProfile);
+    
+    // El profileToSave debe ser del tipo UserProfile
     const profileToSave: UserProfile = {
+      ...this.profile, // Mantiene Vets y otras props no editables en el form
       ownerName: formValue.ownerName,
       email: formValue.email,
       phone: formValue.phone,
       clinic: formValue.clinic,
       notifications: formValue.notifications as UserProfile['notifications'],
-      pets,
-      vets: this.profile?.vets ?? this.profileService.getProfile().vets
+      pets: formValue.pets as PetProfile[],
     };
-    this.profileService.updateProfile(profileToSave);
-    this.profile = this.profileService.getProfile();
+    
+    await this.profileService.updateProfile(profileToSave);
+    this.profile = this.profileService.getProfile(); // Recargamos el perfil actualizado
     this.isSaving = false;
 
     const toast = await this.toastController.create({

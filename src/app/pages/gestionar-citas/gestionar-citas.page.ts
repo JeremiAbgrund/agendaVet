@@ -21,11 +21,11 @@ export class GestionarCitasPage implements OnInit {
 
   async ngOnInit() {
     await this.appointmentsService.ready;
-    this.loadAppointments();
+    await this.loadAppointments();
   }
 
-  loadAppointments(): void {
-    this.appointments = this.appointmentsService.list();
+  async loadAppointments(): Promise<void> {
+    this.appointments = await this.appointmentsService.list();
   }
 
   async postponeAppointment(item: AppointmentItem): Promise<void> {
@@ -40,15 +40,15 @@ export class GestionarCitasPage implements OnInit {
         { text: 'Cancelar', role: 'cancel' },
         {
           text: 'Guardar',
-          handler: data => {
+          handler: async (data) => {
             if (!data.date || !data.time) {
               return false;
             }
-            this.appointmentsService.updateAppointment(item.id, {
+            await this.appointmentsService.updateAppointment(item.id, {
               date: data.date,
               time: data.time
             });
-            this.loadAppointments();
+            await this.loadAppointments();
             this.presentToast('Cita actualizada');
             return true;
           }
@@ -67,9 +67,9 @@ export class GestionarCitasPage implements OnInit {
         {
           text: 'Eliminar',
           role: 'destructive',
-          handler: () => {
-            this.appointmentsService.deleteAppointment(item.id);
-            this.loadAppointments();
+          handler: async () => {
+            await this.appointmentsService.deleteAppointment(item.id);
+            await this.loadAppointments();
             this.presentToast('Cita eliminada');
           }
         }

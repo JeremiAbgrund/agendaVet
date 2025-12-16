@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { DatabaseService } from './shared/services/database.service';
 
 @Component({
   selector: 'app-root',
@@ -7,5 +8,7 @@ import { Component } from '@angular/core';
   standalone: false,
 })
 export class AppComponent {
-  constructor() {}
+  constructor(private databaseService: DatabaseService) {
+    console.log('AppComponent constructor: DatabaseService injected to initialize.');
+  }
 }

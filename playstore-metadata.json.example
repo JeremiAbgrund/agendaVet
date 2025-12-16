@@ -1,0 +1,5 @@
+{
+  "appName": "AgendaVet",
+  "shortDescription": "Aplicación para gestionar citas veterinarias y el perfil de las mascotas.",
+  "fullDescription": "AgendaVet permite crear, gestionar y recordar citas veterinarias; mantener el perfil de tutores y mascotas; enviar solicitudes de soporte y consultar consejos veterinarios. Optimizada para web y dispositivos móviles (Ionic + Capacitor)."
+}

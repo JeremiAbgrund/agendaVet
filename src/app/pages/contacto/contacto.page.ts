@@ -62,7 +62,7 @@ export class ContactoPage implements OnInit {
 
   async ngOnInit() {
     await this.supportService.ready;
-    this.supportHistory = this.supportService.getHistory().slice(0, 3);
+    this.supportHistory = (await this.supportService.getHistory()).slice(0, 3);
   }
 
   get remainingChars(): number {

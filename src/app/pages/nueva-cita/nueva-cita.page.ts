@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { NavController, ToastController } from '@ionic/angular';
+import { firstValueFrom } from 'rxjs';
 import { AppointmentsService } from 'src/app/shared/services/appointments.service';
 import { ProfileService } from 'src/app/shared/services/profile.service';
-import { VetProfile } from 'src/app/shared/models/profile.model';
+import { UserProfile, VetProfile } from 'src/app/shared/models/profile.model';
 import { ApiService } from 'src/app/shared/services/api.service';
 
 @Component({
@@ -37,11 +38,13 @@ export class NuevaCitaPage implements OnInit {
   async ngOnInit() {
     await this.profileService.ready;
     const profile = this.profileService.getProfile();
-    this.vets = profile.vets;
-    this.createForm.patchValue({
-      ownerName: profile.ownerName,
-      vet: profile.vets[0]?.name ?? ''
-    });
+    if (profile) {
+      this.vets = profile.vets;
+      this.createForm.patchValue({
+        ownerName: profile.ownerName,
+        vet: profile.vets[0]?.name ?? ''
+      });
+    }
 
     this.loadVetsFromApi();
   }
@@ -57,7 +60,7 @@ export class NuevaCitaPage implements OnInit {
     }
 
     const value = this.createForm.getRawValue();
-    this.appointmentsService.createAppointment({
+    await this.appointmentsService.createAppointment({
       petName: value.petName,
       ownerName: value.ownerName,
       type: value.type,
@@ -78,15 +81,18 @@ export class NuevaCitaPage implements OnInit {
     this.navController.navigateBack('/listado');
   }
 
-  private loadVetsFromApi(): void {
-    this.apiService.fetchVets().subscribe(vets => {
-      if (vets && vets.length) {
-        this.vets = vets;
-        this.createForm.patchValue({ vet: vets[0].name });
-        const profile = this.profileService.getProfile();
-        this.profileService.updateProfile({ ...profile, vets });
+  private async loadVetsFromApi(): Promise<void> {
+    const vets = await firstValueFrom(this.apiService.fetchVets());
+    if (vets && vets.length) {
+      this.vets = vets;
+      this.createForm.patchValue({ vet: vets[0].name });
+
+      const profile = this.profileService.getProfile();
+      if (profile) {
+        const profileToSave: UserProfile = { ...profile, vets };
+        await this.profileService.updateProfile(profileToSave);
       }
-    });
+    }
   }
 
 }

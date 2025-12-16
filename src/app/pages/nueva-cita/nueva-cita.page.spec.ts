@@ -5,6 +5,9 @@ import { IonicModule, NavController, ToastController } from '@ionic/angular';
 import { NuevaCitaPage } from './nueva-cita.page';
 import { AppointmentsService } from 'src/app/shared/services/appointments.service';
 import { ProfileService } from 'src/app/shared/services/profile.service';
+import { ApiService } from 'src/app/shared/services/api.service';
+import { Storage } from '@ionic/storage-angular';
+import { of } from 'rxjs';
 
 describe('NuevaCitaPage', () => {
   let component: NuevaCitaPage;
@@ -49,7 +52,9 @@ describe('NuevaCitaPage', () => {
         { provide: AppointmentsService, useValue: appointmentsServiceStub },
         { provide: ProfileService, useValue: profileServiceStub },
         { provide: ToastController, useValue: toastControllerStub },
-        { provide: NavController, useValue: navControllerStub }
+        { provide: NavController, useValue: navControllerStub },
+        { provide: Storage, useValue: { create: () => Promise.resolve({ get: async () => null, set: async () => {}, remove: async () => {}, clear: async () => {} }) } },
+        { provide: ApiService, useValue: { fetchVets: () => of([]), fetchTips: () => of([]) } }
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();

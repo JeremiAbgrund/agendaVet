@@ -24,6 +24,13 @@ module.exports = function (config) {
     jasmineHtmlReporter: {
       suppressAll: true // removes the duplicated traces
     },
+    // Definir lanzadores personalizados para entornos headless/CI
+    customLaunchers: {
+      ChromeHeadlessCI: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu', '--remote-debugging-port=9222']
+      }
+    },
     coverageReporter: {
       dir: require('path').join(__dirname, './coverage/app'),
       subdir: '.',
