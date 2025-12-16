@@ -68,3 +68,10 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+DESARROLLO.md
+DESARROLLO_1.md
+DESARROLLO_2.md
+playstore-metadata.json
+playstore-metadata.json.example
+METADATOS_PLAY_STORE.md
+config.xml
