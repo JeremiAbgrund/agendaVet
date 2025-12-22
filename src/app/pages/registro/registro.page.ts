@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 import { DatabaseService } from 'src/app/shared/services/database.service';
 import { ProfileService } from 'src/app/shared/services/profile.service';
+import { StorageService } from 'src/app/shared/services/storage.service';
 
 @Component({
   selector: 'app-registro',
@@ -30,7 +31,8 @@ export class RegistroPage {
     private router: Router,
     private toastController: ToastController,
     private profileService: ProfileService,
-    private databaseService: DatabaseService
+    private databaseService: DatabaseService,
+    private storageService: StorageService
   ) {}
 
   async registrar(): Promise<void> {
@@ -48,7 +50,7 @@ export class RegistroPage {
     } catch (e) {
       this.isSubmitting = false;
       const toast = await this.toastController.create({
-        message: 'El correo electrónico ya está en uso.',
+        message: 'El correo electr¢nico ya est  en uso.',
         duration: 3000,
         color: 'danger',
       });
@@ -56,8 +58,11 @@ export class RegistroPage {
       return;
     }
 
-    // Aún se usa para pre-rellenar el email en el login
-    localStorage.setItem(this.SESSION_KEY, JSON.stringify({ email, timestamp: new Date().toISOString() }));
+    // Guardar sesi¢n para pre-rellenar login y pasar guardia
+    const now = new Date().toISOString();
+    const session = { email, timestamp: now, remember: true };
+    localStorage.setItem(this.SESSION_KEY, JSON.stringify(session));
+    await this.storageService.set(this.SESSION_KEY, session);
 
     const currentProfile = this.profileService.getProfile();
     if (currentProfile) {
@@ -71,7 +76,7 @@ export class RegistroPage {
     }
 
     const toast = await this.toastController.create({
-      message: 'Cuenta creada. Puedes iniciar sesión con tus datos.',
+      message: 'Cuenta creada. Puedes iniciar sesi¢n con tus datos.',
       duration: 2500,
       color: 'success',
       icon: 'checkmark-circle-outline'

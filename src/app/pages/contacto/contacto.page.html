@@ -25,6 +25,7 @@
           <ion-item>
             <ion-icon name="person-outline" slot="start"></ion-icon>
             <ion-input
+              data-cy="contact-fullname"
               label="Nombre completo"
               labelPlacement="stacked"
               placeholder="Ej: Jeremi Riquelme"
@@ -39,6 +40,7 @@
             <ion-icon name="mail-outline" slot="start"></ion-icon>
             <ion-input
               type="email"
+              data-cy="contact-email"
               label="Correo electrónico"
               labelPlacement="stacked"
               placeholder="tucorreo@agendavet.cl"
@@ -54,6 +56,7 @@
             <ion-icon name="call-outline" slot="start"></ion-icon>
             <ion-input
               type="tel"
+              data-cy="contact-phone"
               label="Teléfono (opcional)"
               labelPlacement="stacked"
               placeholder="+56 9 1234 5678"
@@ -68,7 +71,7 @@
             <ion-icon name="folder-outline" slot="start"></ion-icon>
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Tipo de consulta</mat-label>
-              <mat-select formControlName="topic">
+              <mat-select data-cy="contact-topic" formControlName="topic">
                 <mat-option *ngFor="let topic of topics" [value]="topic.value">
                   {{ topic.label }}
                 </mat-option>
@@ -78,7 +81,7 @@
 
           <div class="channel-selector">
             <p>¿Cómo prefieres que te contactemos?</p>
-            <ion-segment formControlName="preferredChannel" mode="md">
+            <ion-segment data-cy="contact-channel" formControlName="preferredChannel" mode="md">
               <ion-segment-button *ngFor="let channel of channels" [value]="channel.value">
                 <ion-label>{{ channel.label }}</ion-label>
               </ion-segment-button>
@@ -90,6 +93,7 @@
             <textarea
               matInput
               rows="4"
+              data-cy="contact-message"
               maxlength="{{ MAX_MESSAGE_LENGTH }}"
               placeholder="Describe brevemente lo ocurrido..."
               formControlName="message"></textarea>
@@ -99,12 +103,12 @@
             </mat-error>
           </mat-form-field>
 
-          <mat-slide-toggle formControlName="ccCopy">
+          <mat-slide-toggle data-cy="contact-ccCopy" formControlName="ccCopy">
             Enviarme copia a mi correo
           </mat-slide-toggle>
         </ion-list>
 
-        <ion-button expand="block" type="submit" [disabled]="contactForm.invalid || isSubmitting">
+        <ion-button data-cy="contact-submit" expand="block" type="submit" [disabled]="contactForm.invalid || isSubmitting">
           <ion-spinner slot="start" name="crescent" *ngIf="isSubmitting"></ion-spinner>
           Enviar solicitud
         </ion-button>

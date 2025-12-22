@@ -19,38 +19,38 @@
         <ion-list lines="full">
           <ion-item>
             <ion-label position="stacked">Nombre completo</ion-label>
-            <ion-input formControlName="ownerName" autocomplete="name"></ion-input>
+            <ion-input data-cy="registro-owner" formControlName="ownerName" autocomplete="name"></ion-input>
           </ion-item>
 
           <ion-item>
             <ion-label position="stacked">Correo</ion-label>
-            <ion-input type="email" formControlName="email" autocomplete="email"></ion-input>
+            <ion-input data-cy="registro-email" type="email" formControlName="email" autocomplete="email"></ion-input>
           </ion-item>
 
           <ion-item>
             <ion-label position="stacked">Contraseña</ion-label>
-            <ion-input type="password" formControlName="password" autocomplete="new-password"></ion-input>
+            <ion-input data-cy="registro-password" type="password" formControlName="password" autocomplete="new-password"></ion-input>
           </ion-item>
 
           <ion-item>
             <ion-label position="stacked">Clínica habitual (opcional)</ion-label>
-            <ion-input formControlName="clinic"></ion-input>
+            <ion-input data-cy="registro-clinic" formControlName="clinic"></ion-input>
           </ion-item>
 
           <ion-item>
             <ion-label position="stacked">Teléfono (opcional)</ion-label>
-            <ion-input type="tel" formControlName="phone"></ion-input>
+            <ion-input data-cy="registro-phone" type="tel" formControlName="phone"></ion-input>
           </ion-item>
 
           <ion-item lines="none">
-            <ion-checkbox formControlName="acceptTerms"></ion-checkbox>
+            <ion-checkbox data-cy="registro-terms" formControlName="acceptTerms"></ion-checkbox>
             <ion-label>
               Acepto el uso de mis datos para gestionar citas y recordatorios.
             </ion-label>
           </ion-item>
         </ion-list>
 
-        <ion-button expand="block" type="submit" [disabled]="registerForm.invalid || isSubmitting">
+        <ion-button data-cy="registro-submit" expand="block" type="submit" [disabled]="registerForm.invalid || isSubmitting">
           <ion-spinner slot="start" name="crescent" *ngIf="isSubmitting"></ion-spinner>
           Crear cuenta
         </ion-button>

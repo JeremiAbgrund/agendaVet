@@ -15,43 +15,102 @@
 
   <form [formGroup]="createForm" (ngSubmit)="submit()">
     <ion-list lines="full">
-        <ion-item>
-          <ion-label position="stacked">Nombre de la mascota</ion-label>
-          <ion-input formControlName="petName" placeholder="Ej: Luna"></ion-input>
-        </ion-item>
-
-        <ion-item>
-          <ion-label position="stacked">Tutor</ion-label>
-          <ion-input formControlName="ownerName" placeholder="Ej: Jeremi Riquelme"></ion-input>
-        </ion-item>
-
-        <ion-item>
-          <ion-label position="stacked">Motivo</ion-label>
-          <ion-input formControlName="type" placeholder="Vacuna anual, control, etc."></ion-input>
-        </ion-item>
-
-        <ion-item>
-          <ion-label position="stacked">Fecha</ion-label>
-          <ion-input type="date" formControlName="date" [min]="today()"></ion-input>
-        </ion-item>
-
-      <ion-item>
-        <ion-label position="stacked">Hora</ion-label>
-        <ion-input type="time" formControlName="time"></ion-input>
+      <ion-item data-cy="nuevacita-pet">
+        <ion-label position="stacked">Nombre de la mascota</ion-label>
+        <ion-input formControlName="petName" placeholder="Ej: Luna"></ion-input>
       </ion-item>
 
-      <ion-item class="vet-select" lines="none">
-        <ion-label position="stacked">Veterinario</ion-label>
-        <ion-select interface="popover" formControlName="vet">
-          <ion-select-option *ngFor="let vet of vets" [value]="vet.name">
-            {{ vet.name }} · {{ vet.specialty }}
-          </ion-select-option>
+      <ion-item data-cy="nuevacita-owner">
+        <ion-label position="stacked">Tutor</ion-label>
+        <ion-input formControlName="ownerName" placeholder="Ej: Jeremi Riquelme"></ion-input>
+      </ion-item>
+
+      <ion-item data-cy="nuevacita-type">
+        <ion-label position="stacked">Motivo</ion-label>
+        <ion-input formControlName="type" placeholder="Vacuna anual, control, etc."></ion-input>
+      </ion-item>
+
+      <ion-item data-cy="nuevacita-species">
+        <ion-label position="stacked">Tipo de mascota</ion-label>
+        <ion-select interface="popover" formControlName="species">
+          <ion-select-option value="perro">Perro</ion-select-option>
+          <ion-select-option value="gato">Gato</ion-select-option>
+          <ion-select-option value="ave">Ave</ion-select-option>
+          <ion-select-option value="otro">Otro</ion-select-option>
         </ion-select>
+      </ion-item>
+
+      <ion-item data-cy="nuevacita-breed">
+        <ion-label position="stacked">Raza (opcional)</ion-label>
+        <ion-input formControlName="breed" placeholder="Ej: Labrador, Siamés, etc."></ion-input>
+      </ion-item>
+
+      <ion-item data-cy="nuevacita-date">
+        <ion-label position="stacked">Fecha</ion-label>
+        <ion-input type="date" formControlName="date" [min]="today()"></ion-input>
+      </ion-item>
+
+      <ion-item data-cy="nuevacita-time">
+        <ion-label position="stacked">Hora</ion-label>
+        <ion-input type="time" formControlName="time"></ion-input>
       </ion-item>
 
       <ion-item>
         <ion-label position="stacked">Notas</ion-label>
         <ion-textarea formControlName="notes" placeholder="Indicaciones adicionales"></ion-textarea>
+      </ion-item>
+
+      <ion-card class="photo-card">
+        <ion-card-header>
+          <ion-card-subtitle>Foto de la mascota (opcional)</ion-card-subtitle>
+          <ion-card-title>Agregar referencia</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <div class="photo-actions">
+            <ion-button size="small" fill="outline" (click)="onTakePhoto()">
+              <ion-icon name="camera-outline" slot="start"></ion-icon>
+              Tomar foto
+            </ion-button>
+            <ion-button size="small" fill="outline" (click)="onPickFromGallery()">
+              <ion-icon name="images-outline" slot="start"></ion-icon>
+              Galería
+            </ion-button>
+          </div>
+          <div class="photo-preview" *ngIf="createForm.get('photo')?.value as photo">
+            <img [src]="photo" alt="Foto de la mascota" />
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-modal #cameraModal [isOpen]="showCameraPreview" (didDismiss)="closeCameraPreview()">
+        <ng-template>
+          <ion-header>
+            <ion-toolbar>
+              <ion-title>Capturar foto</ion-title>
+              <ion-buttons slot="end">
+                <ion-button (click)="closeCameraPreview()">Cerrar</ion-button>
+              </ion-buttons>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content class="ion-padding">
+            <div class="camera-preview">
+              <video #previewVideo autoplay playsinline></video>
+            </div>
+            <ion-button expand="block" color="primary" (click)="captureSnapshot()" [disabled]="isCapturing">
+              <ion-icon slot="start" name="camera"></ion-icon>
+              Capturar
+            </ion-button>
+          </ion-content>
+        </ng-template>
+      </ion-modal>
+
+      <ion-item class="vet-select" lines="none">
+        <ion-label position="stacked">Veterinario</ion-label>
+        <ion-select interface="popover" formControlName="vet">
+          <ion-select-option *ngFor="let vet of vets" [value]="vet.name">
+            {{ vet.name }} - {{ vet.specialty }}
+          </ion-select-option>
+        </ion-select>
       </ion-item>
     </ion-list>
 

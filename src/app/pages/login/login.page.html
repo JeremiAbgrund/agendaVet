@@ -54,7 +54,7 @@
             <ion-toggle formControlName="remember">
               Recordar mis datos
             </ion-toggle>
-            <ion-button size="small" fill="clear" type="button" (click)="fillDemoCredentials()">
+            <ion-button size="small" fill="clear" type="button" data-cy="login-use-demo" (click)="fillDemoCredentials()">
               Usar demo
             </ion-button>
           </div>
@@ -73,6 +73,7 @@
             expand="block"
             type="submit"
             class="login-btn"
+            data-cy="login-submit"
             [disabled]="loginForm.invalid || isSubmitting">
             <ion-spinner slot="start" name="crescent" *ngIf="isSubmitting"></ion-spinner>
             Ingresar

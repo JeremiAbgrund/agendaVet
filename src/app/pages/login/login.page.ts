@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 import { filter, firstValueFrom } from 'rxjs';
 import { DatabaseService } from 'src/app/shared/services/database.service';
+import { StorageService } from 'src/app/shared/services/storage.service';
 
 @Component({
   selector: 'app-login',
@@ -27,23 +28,12 @@ export class LoginPage implements OnInit {
     private fb: FormBuilder,
     private toastController: ToastController,
     private router: Router,
-    private databaseService: DatabaseService
+    private databaseService: DatabaseService,
+    private storageService: StorageService
   ) {}
 
-  ngOnInit() {
-    const cached = localStorage.getItem(this.SESSION_KEY);
-    if (cached) {
-      try {
-        const session = JSON.parse(cached);
-        this.loginForm.patchValue({
-          email: (session.email ?? '').toString().trim().toLowerCase(),
-          remember: true
-        });
-      } catch {
-        // Eliminar datos corruptos en storage
-        localStorage.removeItem(this.SESSION_KEY);
-      }
-    }
+  async ngOnInit() {
+    await this.restoreCachedSession();
   }
 
   get emailInvalid(): boolean {
@@ -129,13 +119,14 @@ export class LoginPage implements OnInit {
     }
 
     if (remember) {
+      // Conserva la sesi¢n en almacenamiento web para auto-rellenar
       localStorage.setItem(
         this.SESSION_KEY,
-        JSON.stringify({ email, timestamp: new Date().toISOString() })
+        JSON.stringify({ email, timestamp: new Date().toISOString(), remember })
       );
-    } else {
-      localStorage.removeItem(this.SESSION_KEY);
     }
+
+    await this.persistSession(email, remember);
 
     this.isSubmitting = false;
 
@@ -148,6 +139,35 @@ export class LoginPage implements OnInit {
     toast.present();
 
     this.router.navigateByUrl('/home', { replaceUrl: true });
+  }
+
+  private async restoreCachedSession(): Promise<void> {
+    const stored = await this.storageService.get<{ email?: string; remember?: boolean; expiresAt?: string }>(this.SESSION_KEY);
+    const session = stored ?? this.readLegacySession();
+
+    if (session?.email) {
+      this.loginForm.patchValue({
+        email: session.email.toString().trim().toLowerCase(),
+        remember: session.remember ?? true
+      });
+    }
+  }
+
+  private readLegacySession(): { email?: string; remember?: boolean } | null {
+    const cached = localStorage.getItem(this.SESSION_KEY);
+    if (!cached) return null;
+    try {
+      return JSON.parse(cached);
+    } catch {
+      localStorage.removeItem(this.SESSION_KEY);
+      return null;
+    }
+  }
+
+  private async persistSession(email: string, remember: boolean): Promise<void> {
+    const now = new Date();
+    const expiresAt = remember ? undefined : new Date(now.getTime() + (12 * 60 * 60 * 1000)).toISOString(); // 12 horas
+    await this.storageService.set(this.SESSION_KEY, { email, timestamp: now.toISOString(), remember, expiresAt });
   }
 
 }

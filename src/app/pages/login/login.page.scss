@@ -9,6 +9,7 @@
   text-align: center;
   margin-top: 2rem;
   color: #fff;
+  animation: zoomIn 0.6s ease-out;
 }
 
 .brand-badge {
@@ -40,6 +41,7 @@
 .card-wrapper {
   width: min(420px, 92vw);
   margin: 2rem auto 4rem;
+  animation: fadeUp 0.6s ease-out 0.1s backwards;
 }
 
 ion-card {
@@ -106,5 +108,27 @@ ion-text {
   a {
     color: var(--ion-color-primary);
     font-weight: 600;
+  }
+}
+
+@keyframes zoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

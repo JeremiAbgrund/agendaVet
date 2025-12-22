@@ -4,9 +4,9 @@ describe('Login E2E', () => {
     // ensure redirected to login
     cy.url().should('include', '/login');
     // click 'Usar demo' to fill demo credentials
-    cy.contains('button', 'Usar demo').click();
+    cy.get('[data-cy="login-use-demo"]').click();
     // click ingresar
-    cy.contains('button', 'Ingresar').click();
+    cy.get('[data-cy="login-submit"]').click();
     // after successful login, we expect to land on /home
     cy.url({ timeout: 10000 }).should('include', '/home');
     // check for a known element on home page

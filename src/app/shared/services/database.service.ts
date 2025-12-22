@@ -98,7 +98,7 @@ export class DatabaseService {
     if (!this.useSQLite || !this.dbObject) return;
     // La creación de tablas solo es necesaria para SQLite
     const queries = [
-      `CREATE TABLE IF NOT EXISTS appointments (id TEXT PRIMARY KEY, petName TEXT, ownerName TEXT, type TEXT, date TEXT, time TEXT, vet TEXT, notes TEXT, status TEXT, favorite INTEGER)`,
+      `CREATE TABLE IF NOT EXISTS appointments (id TEXT PRIMARY KEY, petName TEXT, ownerName TEXT, type TEXT, date TEXT, time TEXT, vet TEXT, notes TEXT, status TEXT, favorite INTEGER, avatar TEXT, photos TEXT)`,
       `CREATE TABLE IF NOT EXISTS pets (id TEXT PRIMARY KEY, name TEXT, species TEXT, breed TEXT, birthdate TEXT, favorite INTEGER)`,
       `CREATE TABLE IF NOT EXISTS support_requests (id TEXT PRIMARY KEY, fullName TEXT, email TEXT, phone TEXT, topic TEXT, message TEXT, preferredChannel TEXT, createdAt TEXT)`,
       `CREATE TABLE IF NOT EXISTS user_profile (id INTEGER PRIMARY KEY DEFAULT 1, data TEXT)`,
@@ -197,7 +197,11 @@ export class DatabaseService {
       const appointments: AppointmentItem[] = [];
       for (let i = 0; i < res.rows.length; i++) {
         const item = res.rows.item(i);
-        appointments.push({ ...item, favorite: Boolean(item.favorite) });
+        appointments.push({
+          ...item,
+          favorite: Boolean(item.favorite),
+          photos: item.photos ? JSON.parse(item.photos) : undefined
+        });
       }
       return appointments;
     }
@@ -206,8 +210,11 @@ export class DatabaseService {
 
   async addAppointment(item: AppointmentItem): Promise<any> {
     if (this.useSQLite) {
-      const { id, petName, ownerName, type, date, time, vet, notes, status, favorite } = item;
-      return this.dbObject!.executeSql('INSERT INTO appointments (id, petName, ownerName, type, date, time, vet, notes, status, favorite) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [id, petName, ownerName, type, date, time, vet, notes, status, favorite ? 1 : 0]);
+      const { id, petName, ownerName, type, date, time, vet, notes, status, favorite, avatar, photos } = item;
+      return this.dbObject!.executeSql(
+        'INSERT INTO appointments (id, petName, ownerName, type, date, time, vet, notes, status, favorite, avatar, photos) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [id, petName, ownerName, type, date, time, vet, notes, status, favorite ? 1 : 0, avatar ?? null, photos ? JSON.stringify(photos) : null]
+      );
     }
     const appointments = await this.getAppointments();
     appointments.unshift(item);
@@ -219,7 +226,11 @@ export class DatabaseService {
       const res = await this.dbObject!.executeSql('SELECT * FROM appointments WHERE id = ?', [id]);
       if (res.rows.length > 0) {
         const item = res.rows.item(0);
-        return { ...item, favorite: Boolean(item.favorite) };
+        return {
+          ...item,
+          favorite: Boolean(item.favorite),
+          photos: item.photos ? JSON.parse(item.photos) : undefined
+        };
       }
       return undefined;
     }
@@ -229,8 +240,13 @@ export class DatabaseService {
 
   async updateAppointment(item: Partial<AppointmentItem> & { id: string }): Promise<any> {
     if (this.useSQLite) {
-      const setClauses = Object.keys(item).filter(k => k !== 'id').map(k => `${k} = ?`).join(', ');
-      const values = Object.values(item).filter(v => typeof v !== 'string' || v !== item.id);
+      const setClauses = Object.keys(item)
+        .filter(k => k !== 'id')
+        .map(k => `${k} = ?`)
+        .join(', ');
+      const values = Object.entries(item)
+        .filter(([k]) => k !== 'id')
+        .map(([k, v]) => (k === 'photos' && v ? JSON.stringify(v) : v));
       values.push(item.id);
       const sql = `UPDATE appointments SET ${setClauses} WHERE id = ?`;
       return this.dbObject!.executeSql(sql, values);

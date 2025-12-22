@@ -5,6 +5,7 @@ import { of } from 'rxjs';
 import { DatabaseService } from 'src/app/shared/services/database.service';
 import { ToastController, IonicModule } from '@ionic/angular';
 import { Router } from '@angular/router';
+import { StorageService } from 'src/app/shared/services/storage.service';
 
 class MockDatabaseService {
   getDatabaseState() { return of(true); }
@@ -24,6 +25,21 @@ class MockRouter {
   navigateByUrl = jasmine.createSpy('navigateByUrl');
 }
 
+class MockStorageService {
+  private store = new Map<string, any>();
+  get<T>(key: string): Promise<T | undefined> {
+    return Promise.resolve(this.store.get(key));
+  }
+  set<T>(key: string, value: T): Promise<void> {
+    this.store.set(key, value);
+    return Promise.resolve();
+  }
+  remove(key: string): Promise<void> {
+    this.store.delete(key);
+    return Promise.resolve();
+  }
+}
+
 describe('LoginPage', () => {
   let component: LoginPage;
   let fixture: ComponentFixture<LoginPage>;
@@ -38,7 +54,8 @@ describe('LoginPage', () => {
       providers: [
         { provide: DatabaseService, useClass: MockDatabaseService },
         { provide: ToastController, useClass: MockToastController },
-        { provide: Router, useClass: MockRouter }
+        { provide: Router, useClass: MockRouter },
+        { provide: StorageService, useClass: MockStorageService }
       ]
     }).compileComponents().then(() => {
       fixture = TestBed.createComponent(LoginPage);

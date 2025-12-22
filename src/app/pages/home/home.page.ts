@@ -4,6 +4,7 @@ import { AppointmentsService } from 'src/app/shared/services/appointments.servic
 import { ProfileService } from 'src/app/shared/services/profile.service';
 import { ApiService, TipItem } from 'src/app/shared/services/api.service';
 import { UserProfile } from 'src/app/shared/models/profile.model';
+import { StorageService } from 'src/app/shared/services/storage.service';
 
 interface QuickAction {
   label: string;
@@ -32,6 +33,7 @@ interface Appointment {
 })
 export class HomePage implements OnInit {
 
+  private readonly SESSION_KEY = 'agendavet_session';
   @ViewChild('heroBlock', { read: ElementRef }) heroBlock?: ElementRef<HTMLElement>;
   @ViewChildren('statCard', { read: ElementRef }) statCards?: QueryList<ElementRef<HTMLElement>>;
 
@@ -79,7 +81,9 @@ export class HomePage implements OnInit {
     private navController: NavController,
     private profileService: ProfileService,
     private alertController: AlertController,
-    private apiService: ApiService
+    private apiService: ApiService,
+    private toastController: ToastController,
+    private storageService: StorageService
   ) {}
 
   async ngOnInit() {
@@ -121,6 +125,19 @@ export class HomePage implements OnInit {
 
   handleQuickAction(action: QuickAction): void {
     this.navController.navigateForward(action.route);
+  }
+
+  async logout(): Promise<void> {
+    await this.storageService.remove(this.SESSION_KEY);
+    localStorage.removeItem(this.SESSION_KEY);
+    const toast = await this.toastController.create({
+      message: 'Sesión cerrada.',
+      duration: 2000,
+      color: 'medium',
+      icon: 'log-out-outline'
+    });
+    toast.present();
+    this.navController.navigateRoot('/login');
   }
 
   goHome(): void {

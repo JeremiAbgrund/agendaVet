@@ -10,5 +10,6 @@ export interface AppointmentItem {
   status: 'confirmada' | 'pendiente';
   favorite?: boolean;
   avatar?: string;
+  photos?: string[];
   location?: string;
 }
