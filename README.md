@@ -2,6 +2,9 @@
 
 Aplicación híbrida Ionic + Angular para gestionar citas veterinarias. Este proyecto sigue los requisitos de la actividad con encargo "Creando mi proyecto Gestor de Citas Veterinarias".
 
+Video desmostracion:
+https://youtu.be/cqSk1OZHdpE
+
 ## Estructura inicial
 - `src/app/pages/login` – página landing con formulario reactivo (pendiente de implementar lógica).
 - `src/app/pages/home` – dashboard posterior al login.
@@ -14,7 +17,7 @@ Aplicación híbrida Ionic + Angular para gestionar citas veterinarias. Este pro
 
 ## Scripts clave
 ```bash
-npm install       # instala dependencias si aún no lo has hecho
+npm install       # instala dependencias
 ionic serve       # levanta la app en modo desarrollo
 ionic g page ...  # genera nuevas páginas lazy
 ionic build       # genera build de producción
