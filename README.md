@@ -6,7 +6,7 @@ Video desmostracion:
 https://youtu.be/cqSk1OZHdpE
 
 ## Estructura inicial
-- `src/app/pages/login` – página landing con formulario reactivo (pendiente de implementar lógica).
+- `src/app/pages/login` – página landing.
 - `src/app/pages/home` – dashboard posterior al login.
 - `src/app/pages/listado` – listado de citas (≥8 ítems).
 - `src/app/pages/detalle/:id` – detalle de la cita con acción de favorito.
